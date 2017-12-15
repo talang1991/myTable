@@ -1,0 +1,7 @@
+##ignore this file##
+/node_modules/
+/dist/
+/.vscode/
+# compression file
+*.rar
+*.lock

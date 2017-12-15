@@ -137,14 +137,12 @@ export class KeyList extends CRUDEntity {
                 message: `key类型错误：${key.keyType}`
             })
         } else {
-            if (key.defaultValue && Util.validValue(key.keyType, key.defaultValue)) {
-                this._addKey(key, callback)
-            } else if (key.defaultValue === undefined) {
+            if (this._validKeyExtraAttr(key)) {
                 this._addKey(key, callback)
             } else {
                 callback({
                     name: 'KeyListRepository->addKey错误',
-                    message: `key.defaultValue类型错误：${key.keyType}:${key.defaultValue}`
+                    message: `key.defaultValue(${key.keyType}):${key.defaultValue},key.isVisible:${key.isVisible},key.isRequired:${key.isRequired}.`
                 })
             }
         }
@@ -199,6 +197,24 @@ export class KeyList extends CRUDEntity {
             this.__addKey(key);
         }
         this._saveEntity(callback);
+    }
+
+    private _validKeyExtraAttr(key: KeyType): boolean {
+        let out = true
+        for (const attr of ['isVisible', 'isRequired', 'defaultValue']) {
+            if (key[attr]) {
+                if (attr === 'defaultValue') {
+                    if (Util.validValue(key.keyType, key, 'defaultValue') === false) {
+                        out = false;
+                        break;
+                    }
+                } else if (Util.validValue('bool', key, attr) === false) {
+                    out = false;
+                    break;
+                }
+            }
+        }
+        return out;
     }
 
     private _getKeyType(type: string): any {

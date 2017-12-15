@@ -7,13 +7,13 @@ import { TestService } from '../../../../utility/test/Util';
 import { fork } from 'child_process';
 import { setting } from '../../../../utility/config/setting';
 import { TableRow } from '../repository/TableRowRepository';
-import { SimpleSyncTaskArray } from '../../../../utility/class/flow/SimpleSyncTaskArray';
+import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
 
 describe("键值对数据表服务类删除行方法测试", () => {
     it("手动新建表后添加行又删除行，则通过getRow不能得到相应行信息", (done) => {
         let listId, rowId, row: TableRow;
         let test = function () {
-            const tasks = new SimpleSyncTaskArray({
+            const tasks = new SyncTaskArray({
                 array: [
                     () => {
                         KeyValueTableService.createTable((err, keyListId) => {

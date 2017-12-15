@@ -7,7 +7,7 @@ import { MemoryCacheService } from '../../../memoryCacheServices/service/MemoryC
 import { TableModelFactorty } from '../factory/TableModelFactorty';
 import { createHash } from 'crypto';
 import { HandleCallback } from '../../../../utility/class/flow/handleCallback';
-import { SimpleSyncTaskArray } from '../../../../utility/class/flow/SimpleSyncTaskArray';
+import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
 import { MemoryCache } from '../../../memoryCacheServices/repository/MemoryCacheRepository';
 
 interface TableCache {
@@ -52,7 +52,7 @@ function _getKeyListByCacheOrDB(callback: (err: IError, keyList: KeyList) => voi
 
 function _addTableKey(callback: (err: IError) => void, keyListId: string, key: KeyType): void {
     let table: Model<Document>;
-    const tasks = new SimpleSyncTaskArray({
+    const tasks = new SyncTaskArray({
         array: [
             () => {
                 _getTableCache((err, tableCache) => {
@@ -82,7 +82,7 @@ function _addTableKey(callback: (err: IError) => void, keyListId: string, key: K
 
 function _removeTableKey(callback: (err: IError) => void, keyListId: string, keyName: string) {
     let table: Model<Document>;
-    const tasks = new SimpleSyncTaskArray({
+    const tasks = new SyncTaskArray({
         array: [
             () => {
                 _getTableCache((err, tableCache) => {
@@ -138,7 +138,7 @@ function _createTable(name: string, keyListId: string, callback: (err: IError) =
 
 function _updateTable(table: TableCache, keyListId: string, callback: (err: IError) => void): void {
     let keyList: KeyList
-    const tasks = new SimpleSyncTaskArray({
+    const tasks = new SyncTaskArray({
         array: [
             () => {
                 _getKeyListByDB((err, kl) => {
@@ -161,7 +161,7 @@ function _updateTable(table: TableCache, keyListId: string, callback: (err: IErr
 function _getTableCache(callback: (err: IError, table: TableCache) => void, keyListId: string): void {
     let tableName: string,
         table: TableCache;
-    const tasks = new SimpleSyncTaskArray({
+    const tasks = new SyncTaskArray({
         array: [
             () => {
                 _getKeyListByCacheOrDB((err, keyList) => {
@@ -202,7 +202,7 @@ function _getTableCache(callback: (err: IError, table: TableCache) => void, keyL
 
 function _getTableRow(callback: (err: IError, tableRow: TableRow) => void, keyListId: string, rowId: string) {
     let table: TableCache;
-    const tasks = new SimpleSyncTaskArray({
+    const tasks = new SyncTaskArray({
         array: [
             () => {
                 _getTableCache((err, tableCache) => {
@@ -222,7 +222,7 @@ function _getTableRow(callback: (err: IError, tableRow: TableRow) => void, keyLi
 
 export class KeyValueTableService {
 
-    static createTable(callback: (err: IError, keyListId: string) => void, name: string): void {
+    static createTable(callback: (err: IError, tableId: string) => void, name: string): void {
         let md5 = createHash('md5'),
             extraName = md5
                 .update((new Date().toDateString() + Math.random().toString(8)))
@@ -230,7 +230,7 @@ export class KeyValueTableService {
             finalName = `${name}_${extraName}`,
             keyListId: string,
             keyList: KeyList;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _createKeyList((err, kl) => {
@@ -253,9 +253,9 @@ export class KeyValueTableService {
         });
     }
 
-    static updateTable(callback: (err: IError) => void, tableName: string, keyListId: string): void {
+    static updateTable(callback: (err: IError) => void, tableName: string, tableId: string): void {
         let table: TableCache
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     table = _getTableByCache(tableName);
@@ -263,28 +263,28 @@ export class KeyValueTableService {
                         _getTableCache((err, tableCache) => {
                             table = tableCache;
                             tasks.next(err);
-                        }, keyListId)
+                        }, tableId)
                     } else {
                         tasks.next();
                     }
                 },
                 () => {
-                    _updateTable(table, keyListId, callback);
+                    _updateTable(table, tableId, callback);
                 }
             ],
             callback: callback
         });
     }
 
-    static addKey(callback: (err: IError) => void, key: KeyType, keyListId: string): void {
+    static addKey(callback: (err: IError) => void, key: KeyType, tableId: string): void {
         let keyList: KeyList;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _getKeyListByCacheOrDB((err, list) => {
                         keyList = list;
                         tasks.next(err);
-                    }, keyListId)
+                    }, tableId)
                 },
                 () => {
                     keyList.addKey((err) => {
@@ -292,25 +292,25 @@ export class KeyValueTableService {
                     }, key);
                 },
                 () => {
-                    _setKeyListInCache(keyListId, keyList);
+                    _setKeyListInCache(tableId, keyList);
                     _addTableKey((err) => {
                         tasks.end(err)
-                    }, keyListId, key);
+                    }, tableId, key);
                 }
             ],
             callback: callback
         });
     }
 
-    static removeKey(callback: (err: IError) => void, keyName: string, keyListId: string): void {
+    static removeKey(callback: (err: IError) => void, keyName: string, tableId: string): void {
         let keyList: KeyList;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _getKeyListByCacheOrDB((err, list) => {
                         keyList = list;
                         tasks.next(err);
-                    }, keyListId)
+                    }, tableId)
                 },
                 () => {
                     keyList.removeKey((err) => {
@@ -318,26 +318,26 @@ export class KeyValueTableService {
                     }, keyName)
                 },
                 () => {
-                    _setKeyListInCache(keyListId, keyList);
+                    _setKeyListInCache(tableId, keyList);
                     _removeTableKey((err) => {
                         tasks.end(err)
-                    }, keyListId, keyName);
+                    }, tableId, keyName);
                 }
             ],
             callback: callback
         });
     }
 
-    static addRow(callback: (err: IError, row: TableRow) => void, keyListId: string, content: any): void {
+    static addRow(callback: (err: IError, row: TableRow) => void, tableId: string, content: any): void {
         let table: TableCache,
             tableName: string;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _getTableCache((err, tableCache) => {
                         table = tableCache;
                         tasks.next(err);
-                    }, keyListId)
+                    }, tableId)
                 },
                 () => {
                     const row = new TableRow((err) => {
@@ -349,23 +349,23 @@ export class KeyValueTableService {
         });
     }
 
-    static getRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string): void {
+    static getRow(callback: (err: IError, row: TableRow) => void, tableId: string, rowId: string): void {
         _getTableRow((err, tableRow) => {
             callback(err, tableRow);
-        }, keyListId, rowId)
+        }, tableId, rowId)
     }
 
-    static updateRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string, content: any): void {
+    static updateRow(callback: (err: IError, row: TableRow) => void, tableId: string, rowId: string, content: any): void {
         let table: TableCache,
             row: TableRow,
             tableName: string;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _getTableRow((err, tableRow) => {
                         row = tableRow;
                         tasks.next(err)
-                    }, keyListId, rowId)
+                    }, tableId, rowId)
                 },
                 () => {
                     row.update((err) => {
@@ -377,17 +377,17 @@ export class KeyValueTableService {
         });
     }
 
-    static deleteRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string): void {
+    static deleteRow(callback: (err: IError, row: TableRow) => void, tableId: string, rowId: string): void {
         let table: TableCache,
             row: TableRow,
             tableName: string;
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     _getTableRow((err, tableRow) => {
                         row = tableRow;
                         tasks.next(err)
-                    }, keyListId, rowId)
+                    }, tableId, rowId)
                 },
                 () => {
                     row.delete((err) => {

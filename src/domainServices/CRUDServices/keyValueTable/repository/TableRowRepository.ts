@@ -1,9 +1,9 @@
 import { CRUDEntity } from "../../utility/CRUDEntity";
 import { Model, Document } from 'mongoose';
 import { IError } from '../../../../utility/interface/IError';
-import { SimpleSyncTaskArray } from "../../../../utility/class/flow/SimpleSyncTaskArray";
+import { SyncTaskArray } from "../../../../utility/class/flow/SyncTaskArray";
 import { HandleCallback } from "../../../../utility/class/flow/handleCallback";
-import { Util } from '../../../../utility/class/Util';
+import { Util, ParserString } from '../../../../utility/class/Util';
 import { KeyTableValue } from '../schema/KeySchema';
 
 
@@ -71,13 +71,9 @@ export class TableRow extends CRUDEntity {
             });
         }
         function _setValidContent(this: TableRow, key: string): string {
-            let type = this._keyTable[key].type,
-                value = content[key];
-            if (type === 'date') {
-                value = new Date(value);
-            }
-            if (Util.validValue(type, value)) {
-                validContent[key] = value;
+            let type = this._keyTable[key].type;
+            if (Util.validValue(type, content, key)) {
+                validContent[key] = content[key];
                 return 'ok';
             } else {
                 return type;
@@ -102,7 +98,7 @@ export class TableRow extends CRUDEntity {
     }
 
     update(callback: (err: URIError) => void, content: any) {
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     this._setEntity(content, (err) => {

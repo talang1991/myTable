@@ -3,7 +3,6 @@ import { SyncTaskArray } from '../../../utility/class/flow/SyncTaskArray';
 import { ICRUDEntity } from '../../../utility/interface/entity/ICRUDEntity';
 import { createHash } from "crypto";
 import { IError } from '../../../utility/interface/IError';
-import { SimpleSyncTaskArray } from '../../../utility/class/flow/SimpleSyncTaskArray';
 /**
  * 这是一个CRUD实体对象的抽象基类
  * 
@@ -78,7 +77,7 @@ export abstract class CRUDEntity implements ICRUDEntity {
     }
 
     private _createNewEntity() {
-        const tasks = new SimpleSyncTaskArray({
+        const tasks = new SyncTaskArray({
             array: [
                 () => {
                     this._setId();

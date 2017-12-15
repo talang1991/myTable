@@ -5,14 +5,14 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { fork } from 'child_process';
-import { SimpleSyncTaskArray } from '../../../../utility/class/flow/SimpleSyncTaskArray';
+import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
 import { TableRow } from '../repository/TableRowRepository';
 
 describe("键值对数据表服务类更新行方法测试", () => {
     it("手动新建表后更新行，且通过getRow能得到相应行信息", (done) => {
         let listId, rowId, row: TableRow;
         let test = function () {
-            const tasks = new SimpleSyncTaskArray({
+            const tasks = new SyncTaskArray({
                 array: [
                     () => {
                         KeyValueTableService.createTable((err, keyListId) => {

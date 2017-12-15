@@ -5,7 +5,7 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { fork } from 'cluster';
-describe("键值对数据表服务类删除行方法测试", () => {
+describe("键值对数据表服务类删除字段方法测试", () => {
     let id;
     it("手动新建带字段表后删除某字段，addRow后能通过getRow能得到相应行信息", (done) => {
         let test = function () {

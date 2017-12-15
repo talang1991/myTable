@@ -1,14 +1,14 @@
 {
-    "name": "myshop",
+    "name": "myTable",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "author": "",
     "license": "ISC",
     "scripts": {
-        "test": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
-        "testC": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register src/**/__test__/**/CatalogueServiceSetCatalogueRefTest.ts",
-        "testX": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test.ts"
+        "test": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
+        "testC": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register src/**/__test__/**/CatalogueServiceSetCatalogueRefTest.ts",
+        "testX": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register test.ts"
     },
     "devDependencies": {
         "@types/body-parser": "*",

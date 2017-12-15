@@ -349,6 +349,12 @@ export class KeyValueTableService {
         });
     }
 
+    static getRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string): void {
+        _getTableRow((err, tableRow) => {
+            callback(err, tableRow);
+        }, keyListId, rowId)
+    }
+
     static updateRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string, content: any): void {
         let table: TableCache,
             row: TableRow,
@@ -371,7 +377,7 @@ export class KeyValueTableService {
         });
     }
 
-    static deleteRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string, content: any): void {
+    static deleteRow(callback: (err: IError, row: TableRow) => void, keyListId: string, rowId: string): void {
         let table: TableCache,
             row: TableRow,
             tableName: string;

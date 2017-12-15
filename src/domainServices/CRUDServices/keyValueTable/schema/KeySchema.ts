@@ -29,7 +29,7 @@ let KeySchema = new Schema({
         isRequired: Boolean,
         defaultValue: {}
     }],
-    keyIndexTable: { type: Object, default: { _id: 1 } },
+    keyIndexTable: {},
     keyTable: {}
 });
 

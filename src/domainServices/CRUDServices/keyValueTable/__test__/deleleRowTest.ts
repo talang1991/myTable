@@ -5,11 +5,12 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { fork } from 'child_process';
-import { SimpleSyncTaskArray } from '../../../../utility/class/flow/SimpleSyncTaskArray';
+import { setting } from '../../../../utility/config/setting';
 import { TableRow } from '../repository/TableRowRepository';
+import { SimpleSyncTaskArray } from '../../../../utility/class/flow/SimpleSyncTaskArray';
 
-describe("键值对数据表服务类更新行方法测试", () => {
-    it("手动新建表后更新行，且通过getRow能得到相应行信息", (done) => {
+describe("键值对数据表服务类删除行方法测试", () => {
+    it("手动新建表后添加行又删除行，则通过getRow不能得到相应行信息", (done) => {
         let listId, rowId, row: TableRow;
         let test = function () {
             const tasks = new SimpleSyncTaskArray({
@@ -30,17 +31,17 @@ describe("键值对数据表服务类更新行方法测试", () => {
                         }, 'xxx')
                     },
                     () => {
-                        KeyValueTableService.updateRow((err, tableRow) => {
-                            row = tableRow;
+                        KeyValueTableService.deleteRow((err, tableRow) => {
                             tasks.next(err);
-                        }, listId, rowId, { ttt: '2017-11-11', 'CCC': 'llll' });
+                        }, listId, rowId);
                     },
                     () => {
-                        let rowC = row.getContent();
-                        expect(rowC.ttt.getTime()).to.equal(new Date('2017-11-11').getTime());
-                        expect(rowC.CCC).to.equal('llll');
-                        disconnect();
-                        done()
+                        KeyValueTableService.getRow((err, row) => {
+                            expect(err.name).to.equal('未找到相应ID实体');
+                            expect(err.message).to.equal('请确认相应实体ID');
+                            disconnect();
+                            done()
+                        }, listId, rowId)
                     }
                 ], callback: (err) => {
                     console.log(err);

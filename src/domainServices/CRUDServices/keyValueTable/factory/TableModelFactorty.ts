@@ -22,7 +22,9 @@ export class TableModelFactorty {
         table._id = String;
         table.keyListId = String;
         let schema = new Schema(table);
-        schema.index(indexObj);
+        if (indexObj) {
+            schema.index(indexObj);
+        }
         return model(schemaName, schema);
     }
 

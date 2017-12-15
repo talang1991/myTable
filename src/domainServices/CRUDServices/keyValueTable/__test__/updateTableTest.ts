@@ -4,8 +4,7 @@ import { MemoryCacheService } from '../../../memoryCacheServices/service/MemoryC
 import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
-import { writeFile, readFile, readFileSync, existsSync } from 'fs';
-import { resolve } from 'url';
+import { resolve } from 'path';
 import { fork } from 'child_process';
 import { setting } from '../../../../utility/config/setting';
 
@@ -18,7 +17,7 @@ describe("键值对数据表服务类更新表方法测试", () => {
                 KeyValueTableService.addKey((err) => {
                     KeyValueTableService.addKey((err) => {
                         let keyList: KeyList = MemoryCacheService.getCache(setting.keyValueTableCache.keyList).getValue(keyListId);
-                        let worker = fork(resolve(__dirname.replace('src', 'dist'), './__test__/worker/updateTableWorker.js'));
+                        let worker = fork(resolve(__dirname.replace('src', 'dist'), './worker/updateTableWorker.js'));
                         worker.on('message', function (message) {//接收工作进程计算结果
                             let date = new Date(message.row.ddd);
                             expect(date.getTime()).to.equal(new Date('2017-11-21').getTime());

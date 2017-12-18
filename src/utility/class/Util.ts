@@ -20,6 +20,14 @@ export class Util {
         return false;
     }
 
+    static setPossibleValueFormBody(target: any, key: string, body: any) {
+        let value = body[key];
+        if (value !== undefined) {
+            target[key] = value;
+        }
+    }
+
+    /* 
     static setValueForBool(target: any, key: string, value: string): void {
         if (value === 'true') {
             target[key] = true
@@ -32,7 +40,7 @@ export class Util {
         if (isString(value)) {
             target[key] = ParserString.object(value);
         }
-    }
+    } */
 
 
     //'str' | 'num' | 'any' | 'bool' | 'date'

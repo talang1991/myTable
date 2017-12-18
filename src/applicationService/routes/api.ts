@@ -2,20 +2,32 @@ import { Router } from "express";
 import { SyncTaskArray } from '../../utility/class/flow/SyncTaskArray';
 import { KeyValueTableService } from '../../domainServices/CRUDServices/keyValueTable/service/KeyValueTableService';
 import { KeyType } from "../../domainServices/CRUDServices/keyValueTable/schema/KeySchema";
-import { Util } from "../../utility/class/Util";
+import { Util } from '../../utility/class/Util';
 import { TableRow } from '../../domainServices/CRUDServices/keyValueTable/repository/TableRowRepository';
 
 export const api = Router();
 
 api.post('/createTable', (req, res) => {
-    let tableId;
+    let tableId: string,
+        name: string;
     const tasks = new SyncTaskArray({
         array: [
+            () => {
+                name = req.body.name;
+                if (name) {
+                    tasks.next();
+                } else {
+                    tasks.next({
+                        name: 'createTable请求缺少参数',
+                        message: `name:${name}`
+                    })
+                }
+            },
             () => {
                 KeyValueTableService.createTable((err, tid) => {
                     tableId = tid;
                     tasks.next(err);
-                }, req.body.name);
+                }, name);
             },
             () => {
                 res.json({
@@ -46,9 +58,9 @@ api.post('/addKey', (req, res) => {
                         name: name,
                         keyType: keyType
                     };
-                    key.isVisible = req.body.isVisible ? req.body.isVisible : undefined
-                    key.isRequired = req.body.isRequired ? req.body.isRequired : undefined
-                    key.defaultValue = req.body.defaultValue ? req.body.defaultValue : undefined
+                    Util.setPossibleValueFormBody(key, 'isVisible', req.body);
+                    Util.setPossibleValueFormBody(key, 'isRequired', req.body);
+                    Util.setPossibleValueFormBody(key, 'defaultValue', req.body);
                     tasks.next();
                 } else {
                     tasks.next({
@@ -127,8 +139,8 @@ api.get('/getRow', (req, res) => {
     const tasks = new SyncTaskArray({
         array: [
             () => {
-                tableId = req.body.tableId,
-                    rowId = req.body.rowId;
+                tableId = req.body.tableId;
+                rowId = req.body.rowId;
                 if (tableId && rowId) {
                     tasks.next();
                 } else {

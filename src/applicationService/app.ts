@@ -10,13 +10,15 @@ import { existsSync, mkdirSync, createWriteStream } from "fs";
 import { connect } from "mongoose";
 import { Util } from "../utility/class/Util";
 import { api } from "./routes/api";
+import * as mongoose from "mongoose";
+(<any>mongoose).Promise = global.Promise;
 const MongoStore = connectMongo(session)
 const logPath = resolve(__dirname, './log');
 existsSync(logPath) || mkdirSync(logPath);
 const now = Util.getDateString(new Date());
 let accessLogFile = createWriteStream(resolve(logPath, './access_' + now + '.log'), { flags: 'a' });
 let errorLogFile = createWriteStream(resolve(logPath, './error_' + now + '.log'), { flags: 'a' });
-connect('mongodb://localhost/table');
+connect('mongodb://localhost/table', { useMongoClient: true });
 
 const app = express();
 

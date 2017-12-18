@@ -73,6 +73,9 @@ export class TableRow extends CRUDEntity {
         function _setValidContent(this: TableRow, key: string): string {
             let type = this._keyTable[key].type;
             if (Util.validValue(type, content, key)) {
+                if (type === 'any') {
+                    this._document.markModified(key);
+                }
                 validContent[key] = content[key];
                 return 'ok';
             } else {

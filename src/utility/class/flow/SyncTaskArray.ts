@@ -3,7 +3,7 @@ import { IError } from '../../interface/IError';
 
 interface ICallbackParam {
     array: (() => void)[]
-    callback: (err: IError, param: any) => void
+    callback: (err: IError, param?: any) => void
     param?: any
 }
 

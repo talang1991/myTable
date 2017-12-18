@@ -119,7 +119,7 @@ describe("数据表服务类api接口测试", () => {
                     .end((err) => {
                         requestwebapi
                             .post('http://localhost:3000/api/addRow')
-                            .send({ 'tableId': tableId })
+                            .send({ 'tableId': tableId, '3ssXss': { ddd: 12312 } })
                             .end((err, res) => {
                                 let rowId = res.body.rowId;
                                 expect(res.body.status).to.equal(1);
@@ -129,7 +129,7 @@ describe("数据表服务类api接口测试", () => {
                                     .end((err, res) => {
                                         expect(res.body.row['1ssXss'].sss).to.equal(111);
                                         expect(res.body.row['2ssXss'].sss).to.equal(222);
-                                        expect(res.body.row['3ssXss'].sss).to.equal(333);
+                                        expect(res.body.row['3ssXss'].ddd).to.equal(12312);
                                         expect(res.body.status).to.equal(1);
                                         done();
                                     })

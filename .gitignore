@@ -1,7 +1,7 @@
 ##ignore this file##
 /node_modules/
 /dist/
-/.vscode/
+launch.json
 # compression file
 *.rar
 *.lock

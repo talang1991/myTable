@@ -88,52 +88,53 @@ describe("数据表服务类api接口测试", () => {
             .end((err, res) => {
                 let tableId = res.body.tableId;
                 expect(res.body.status).to.equal(1);
-                const tasks = new AsyncTaskArray((err) => {
-                    requestwebapi
-                        .post('http://localhost:3000/api/addRow')
-                        .send({ 'tableId': tableId })
-                        .end((err, res) => {
-                            let rowId = res.body.rowId;
-                            expect(res.body.status).to.equal(1);
-                            requestwebapi
-                                .post('http://localhost:3000/api/getRow')
-                                .send({ 'rowId': rowId, 'tableId': tableId })
-                                .end((err, res) => {
-                                    expect(res.body.row['1ssXss'].sss).to.equal(111);
-                                    expect(res.body.row['2ssXss'].sss).to.equal(222);
-                                    expect(res.body.row['3ssXss'].sss).to.equal(333);
-                                    expect(res.body.status).to.equal(1);
-                                    done();
-                                })
-                        })
-                });
-                tasks.addTask(() => {
-                    requestwebapi
-                        .post('http://localhost:3000/api/addKey')
-                        .send({ 'name': '1ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 111 }, 'isRequired': false })
-                        .end((err, res) => {
-                            expect(res.body.status).to.equal(1);
-                            tasks.ckeckTasks();
-                        })
-                })
-                tasks.addTask(() => {
-                    requestwebapi
-                        .post('http://localhost:3000/api/addKey')
-                        .send({ 'name': '2ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 222 }, 'isRequired': false })
-                        .end((err, res) => {
-                            expect(res.body.status).to.equal(1);
-                            tasks.ckeckTasks();
-                        })
-                })
-                tasks.addTask(() => {
-                    requestwebapi
-                        .post('http://localhost:3000/api/addKey')
-                        .send({ 'name': '3ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 333 }, 'isRequired': false })
-                        .end((err, res) => {
-                            expect(res.body.status).to.equal(1);
-                            tasks.ckeckTasks();
-                        })
-                })
+                const tasks = new AsyncTaskArray()
+                    .add(() => {
+                        requestwebapi
+                            .post('http://localhost:3000/api/addKey')
+                            .send({ 'name': '1ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 111 }, 'isRequired': false })
+                            .end((err, res) => {
+                                expect(res.body.status).to.equal(1);
+                                tasks.ckeck();
+                            })
+                    })
+                    .add(() => {
+                        requestwebapi
+                            .post('http://localhost:3000/api/addKey')
+                            .send({ 'name': '2ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 222 }, 'isRequired': false })
+                            .end((err, res) => {
+                                expect(res.body.status).to.equal(1);
+                                tasks.ckeck();
+                            })
+                    })
+                    .add(() => {
+                        requestwebapi
+                            .post('http://localhost:3000/api/addKey')
+                            .send({ 'name': '3ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 333 }, 'isRequired': false })
+                            .end((err, res) => {
+                                expect(res.body.status).to.equal(1);
+                                tasks.ckeck();
+                            })
+                    })
+                    .end((err) => {
+                        requestwebapi
+                            .post('http://localhost:3000/api/addRow')
+                            .send({ 'tableId': tableId })
+                            .end((err, res) => {
+                                let rowId = res.body.rowId;
+                                expect(res.body.status).to.equal(1);
+                                requestwebapi
+                                    .post('http://localhost:3000/api/getRow')
+                                    .send({ 'rowId': rowId, 'tableId': tableId })
+                                    .end((err, res) => {
+                                        expect(res.body.row['1ssXss'].sss).to.equal(111);
+                                        expect(res.body.row['2ssXss'].sss).to.equal(222);
+                                        expect(res.body.row['3ssXss'].sss).to.equal(333);
+                                        expect(res.body.status).to.equal(1);
+                                        done();
+                                    })
+                            })
+                    })
             })
     })
     after(() => {

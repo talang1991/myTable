@@ -5,51 +5,58 @@ export class AsyncTaskArray {
     private _tasksNum: number;
     private _err: IError = { name: 'taskList运行错误', message: null };
 
-    private _callback: (err: IError, params?: any) => void;
+    private _callbackFunc: (err: IError, params?: any) => void;
 
     private _callbackParams: any;
 
-    constructor(callback: (err: IError, params?: any) => void, params?: any) {
+    constructor() {
         this._tasksNum = 0;
-        this._callbackParams = params;
-        this._callback = callback;
-        this._callbackParams = params;
+        return this;
     }
 
-    ckeckTasks(error?: IError): void {
+    set(params?: any): AsyncTaskArray {
+        this._callbackParams = params;
+        return this;
+    }
+
+    end(callback: (err: IError, params?: any) => void): AsyncTaskArray {
+        this._callbackFunc = callback;
+        return this;
+    }
+
+    ckeck(error?: IError): void {
         this._tasksNum--;
+        this._setErrorMessage(error);
+        if (this._tasksNum === 0) {
+            this._callback();
+        }
+    }
+
+    add(func?: () => void): AsyncTaskArray {
+        if (isFunction(func)) {
+            setTimeout(() => {
+                func();
+            }, 10);
+        }
+        this._tasksNum++;
+        return this;
+    }
+
+    private _setErrorMessage(error?: IError): void {
         if (isNullOrUndefined(error) === false) {
             if (this._err.message !== null) {
                 this._err.message += ',' + error.message
             } else {
                 this._err.message = error.message;
-            };
-        };
-        if (this._tasksNum === 0) {
-            if (this._err.message !== null) {
-                this._callback(this._err, null);
-            } else {
-                this._callback(null, this._callbackParams);
-            };
-        };
-    }
-
-    addTask(func?: () => void): void {
-        if (isFunction(func)) {
-            func();
+            }
         }
-        this._tasksNum++;
     }
 
-    /* protected setErrorMessage(message: string): void {
-        this._err.message = message;
-    } */
-
-    protected callback() {
+    private _callback() {
         if (this._err.message !== null) {
-            this._callback(this._err, this._callbackParams);
+            this._callbackFunc(this._err, this._callbackParams);
         } else {
-            this._callback(null, this._callbackParams);
-        };
+            this._callbackFunc(null, this._callbackParams);
+        }
     }
 }

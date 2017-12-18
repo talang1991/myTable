@@ -17,7 +17,7 @@ describe("键值对数据表服务类更新表方法测试", () => {
                 KeyValueTableService.addKey((err) => {
                     KeyValueTableService.addKey((err) => {
                         let keyList: KeyList = MemoryCacheService.getCache(setting.keyValueTableCache.keyList).getValue(keyListId);
-                        let worker = fork(resolve(__dirname.replace('src', 'dist'), './worker/updateTableWorker.js'));
+                        let worker = fork(resolve(__dirname.replace('src', 'dist'), './worker/updateTableWorkerTest.js'));
                         worker.on('message', function (message) {//接收工作进程计算结果
                             let date = new Date(message.row.ddd);
                             expect(date.getTime()).to.equal(new Date('2017-11-21').getTime());

@@ -4,7 +4,6 @@ import { MemoryCacheService } from '../../../memoryCacheServices/service/MemoryC
 import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
-import { fork } from 'child_process';
 import { setting } from '../../../../utility/config/setting';
 import { TableRow } from '../repository/TableRowRepository';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';

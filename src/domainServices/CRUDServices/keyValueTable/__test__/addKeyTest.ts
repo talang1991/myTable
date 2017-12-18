@@ -5,7 +5,6 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { resolve } from 'path';
-import { fork } from 'child_process';
 import { setting } from '../../../../utility/config/setting';
 
 describe("键值对数据表服务类添加表键方法测试", () => {

@@ -42,7 +42,7 @@ describe("键值对数据表服务类添加行方法测试", () => {
     })
     it("添加过数据表系统重启后addRow，且通过getRow能得到相应行信息", (done) => {
         let test = function () {
-            let worker = fork(resolve(__dirname.replace('src', 'dist'), './worker/addRowWorker.js'));
+            let worker = fork(resolve(__dirname.replace('src', 'dist'), './worker/addRowWorkerTest.js'));
             worker.on('message', function (message) {//接收工作进程计算结果
                 let date = new Date(message.row.ttt);
                 expect(date.getTime()).to.equal(new Date('2017-11-21').getTime());

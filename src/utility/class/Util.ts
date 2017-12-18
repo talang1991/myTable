@@ -55,7 +55,7 @@ export class Util {
                     target[key] = value;
                 }
                 return isNumber(value);
-            case 'obj':
+            case 'any':
                 if (isString(value)) {
                     value = ParserString.object(value);
                     target[key] = value;

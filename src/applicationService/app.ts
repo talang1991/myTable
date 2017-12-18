@@ -24,7 +24,7 @@ const app = express();
 
 app.set('trust proxy', 'loopback');
 app.use(logger('combined', { stream: accessLogFile }));
-
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({

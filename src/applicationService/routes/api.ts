@@ -14,11 +14,11 @@ api.post('/createTable', (req, res) => {
         array: [
             () => {
                 name = req.body.name;
-                if (name) {
+                if (name && /\w+/i.exec(name)[0] === name) {
                     tasks.next();
                 } else {
                     tasks.next({
-                        name: 'createTable请求缺少参数',
+                        name: 'createTable请求缺少参数,或参数不合法',
                         message: `name:${name}`
                     })
                 }
@@ -53,7 +53,7 @@ api.post('/addKey', (req, res) => {
                 let name = req.body.name,
                     keyType = req.body.keyType;
                 tableId = req.body.tableId;
-                if (name && keyType && tableId && Util.isValidType(keyType)) {
+                if (name && /\w+/i.exec(name)[0] === name && keyType && tableId && Util.isValidType(keyType)) {
                     key = {
                         name: name,
                         keyType: keyType
@@ -127,12 +127,15 @@ api.post('/addRow', (req, res) => {
             }
         ],
         callback: (err) => {
-            res.json({ error: err })
+            res.json({
+                error: err,
+                status: 0
+            })
         }
     });
 });
 
-api.get('/getRow', (req, res) => {
+api.post('/getRow', (req, res) => {
     let tableId: string,
         row: TableRow,
         rowId: string;
@@ -158,13 +161,16 @@ api.get('/getRow', (req, res) => {
             },
             () => {
                 res.json({
-                    row: row,
+                    row: row.getContent(),
                     status: 1
                 })
             }
         ],
         callback: (err) => {
-            res.json({ error: err })
+            res.json({
+                error: err,
+                status: 0
+            })
         }
     });
 });

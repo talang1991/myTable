@@ -1,7 +1,6 @@
 import { IError } from '../../interface/IError';
 import { isFunction, isNullOrUndefined } from 'util';
 
-
 export class AsyncTaskArray {
     private _tasksNum: number;
     private _err: IError = { name: 'taskList运行错误', message: null };

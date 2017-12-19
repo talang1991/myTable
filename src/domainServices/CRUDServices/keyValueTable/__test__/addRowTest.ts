@@ -26,7 +26,7 @@ describe("键值对数据表服务类添加行方法测试", () => {
                 }, { name: 'ttt', keyType: 'date', isRequired: true }, keyListId)
             }, 'xxx')
         }
-        new TestService(test);
+        new TestService(test, true);
     })
     it("添加过数据表后addRow，且通过getRow能得到相应行信息", (done) => {
         let test = function () {
@@ -38,7 +38,7 @@ describe("键值对数据表服务类添加行方法测试", () => {
                 done()
             }, id, { ttt: '2017-11-21' });
         }
-        new TestService(test);
+        new TestService(test, true);
     })
     it("添加过数据表系统重启后addRow，且通过getRow能得到相应行信息", (done) => {
         let test = function () {
@@ -53,6 +53,6 @@ describe("键值对数据表服务类添加行方法测试", () => {
             });
             worker.send({ id: id });
         }
-        new TestService(test);
+        new TestService(test, true);
     })
 })

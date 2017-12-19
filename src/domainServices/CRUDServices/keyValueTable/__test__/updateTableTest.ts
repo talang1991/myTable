@@ -34,6 +34,6 @@ describe("键值对数据表服务类更新表方法测试", () => {
                 }, { name: 'ddd', keyType: 'date', isRequired: true }, keyListId)
             }, 'xxx')
         }
-        new TestService(test);
+        new TestService(test, true);
     })
 })

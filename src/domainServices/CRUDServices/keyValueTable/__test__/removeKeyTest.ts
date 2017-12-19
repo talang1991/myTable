@@ -25,7 +25,7 @@ describe("键值对数据表服务类删除字段方法测试", () => {
                 }, { name: 'ttt', keyType: 'date', isRequired: true }, keyListId)
             }, 'xxx')
         }
-        new TestService(test);
+        new TestService(test, true);
     })
     it("删除过数据表字段后addRow，且通过getRow能得到相应行信息", (done) => {
         let test = function () {
@@ -37,6 +37,6 @@ describe("键值对数据表服务类删除字段方法测试", () => {
                 done()
             }, id, { ttt: '2017-11-21' });
         }
-        new TestService(test);
+        new TestService(test, true);
     })
 })

@@ -21,37 +21,75 @@ describe("数据表服务类api接口测试", () => {
         }, 500);
         wait.wait();
         let test = () => {
+            let start = Date.now();
             requestwebapi
                 .post('http://localhost:3000/api/createTable')
                 .send({ 'name': '1ysddfx' })
                 .end((err, res) => {
                     let tableId = res.body.tableId;
                     expect(res.body.status).to.equal(1);
-                    requestwebapi
-                        .post('http://localhost:3000/api/addKey')
-                        .send({ 'name': '1ssxss', 'keyType': 'str', 'tableId': tableId })
-                        .end((err, res) => {
-                            expect(res.body.status).to.equal(1);
+                    const tasks = new AsyncTaskArray()
+                        .add(() => {
+                            requestwebapi
+                                .post('http://localhost:3000/api/addKey')
+                                .send({ 'name': '1ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 111 }, 'isRequired': false })
+                                .end((err, res) => {
+
+
+                                    expect(res.body.status).to.equal(1);
+                                    tasks.ckeck();
+                                })
+                        })
+                        .add(() => {
+                            requestwebapi
+                                .post('http://localhost:3000/api/addKey')
+                                .send({ 'name': '2ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 222 }, 'isRequired': false })
+                                .end((err, res) => {
+                                    expect(res.body.status).to.equal(1);
+                                    tasks.ckeck();
+                                })
+                        })
+                        .add(() => {
+                            requestwebapi
+                                .post('http://localhost:3000/api/addKey')
+                                .send({ 'name': '3ssXss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 333 }, 'isRequired': false })
+                                .end((err, res) => {
+                                    expect(res.body.status).to.equal(1);
+                                    tasks.ckeck();
+                                })
+                        })
+                        .end((err) => {
                             requestwebapi
                                 .post('http://localhost:3000/api/addRow')
-                                .send({ '1ssxss': 'sdafqwe', 'tableId': tableId })
+                                .send({ 'tableId': tableId, '3ssXss': { ddd: 12312 } })
                                 .end((err, res) => {
                                     let rowId = res.body.rowId;
                                     expect(res.body.status).to.equal(1);
                                     requestwebapi
-                                        .post('http://localhost:3000/api/getRow')
-                                        .send({ 'rowId': rowId, 'tableId': tableId })
+                                        .post('http://localhost:3000/api/updateRow')
+                                        .send({ 'rowId': rowId, 'tableId': tableId, '3ssXss': { ccc: 'sdasd' }, '1ssXss': { sss: 'qwe' } })
                                         .end((err, res) => {
-                                            expect(res.body.row['1ssxss']).to.equal('sdafqwe');
                                             expect(res.body.status).to.equal(1);
-                                            done();
+                                            requestwebapi
+                                                .post('http://localhost:3000/api/getRow')
+                                                .send({ 'rowId': rowId, 'tableId': tableId })
+                                                .end((err, res) => {
+                                                    expect(res.body.row['1ssXss'].sss).to.equal('qwe');
+                                                    expect(res.body.row['2ssXss'].sss).to.equal(222);
+                                                    expect(res.body.row['3ssXss'].ddd).to.equal(12312);
+                                                    expect(res.body.row['3ssXss'].ccc).to.equal('sdasd');
+                                                    expect(res.body.status).to.equal(1);
+                                                    let end = Date.now();
+                                                    console.log(`1:${end - start}`);
+                                                    test();
+                                                })
                                         })
                                 })
                         })
                 })
         }
     })
-    it("createTable接口测试2", (done) => {
+    /* it("createTable接口测试2", (done) => {
         requestwebapi
             .post('http://localhost:3000/api/createTable')
             .send({ 'name': '1ysddfx' })
@@ -62,17 +100,20 @@ describe("数据表服务类api接口测试", () => {
                     .post('http://localhost:3000/api/addKey')
                     .send({ 'name': '1ssxss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 111 }, 'isRequired': false })
                     .end((err, res) => {
+
                         expect(res.body.status).to.equal(1);
                         requestwebapi
                             .post('http://localhost:3000/api/addRow')
                             .send({ 'tableId': tableId })
                             .end((err, res) => {
+
                                 let rowId = res.body.rowId;
                                 expect(res.body.status).to.equal(1);
                                 requestwebapi
                                     .post('http://localhost:3000/api/getRow')
                                     .send({ 'rowId': rowId, 'tableId': tableId })
                                     .end((err, res) => {
+
                                         expect(res.body.row['1ssxss'].sss).to.equal(111);
                                         expect(res.body.status).to.equal(1);
                                         done();
@@ -137,6 +178,50 @@ describe("数据表服务类api接口测试", () => {
                     })
             })
     })
+    it("createTable接口测试4", (done) => {
+        const wait = new WaitUntil(() => {
+            return onListen;
+        }, () => {
+            test();
+        }, 500);
+        let test = () => {
+            let start = Date.now();
+            requestwebapi
+                .post('http://localhost:3000/api/createTable')
+                .send({ 'name': '1ysddfx' })
+                .end((err, res) => {
+
+                    let tableId = res.body.tableId;
+                    expect(res.body.status).to.equal(1);
+                    requestwebapi
+                        .post('http://localhost:3000/api/addKey')
+                        .send({ 'name': '1ssxss', 'keyType': 'str', 'tableId': tableId })
+                        .end((err, res) => {
+
+                            expect(res.body.status).to.equal(1);
+                            requestwebapi
+                                .post('http://localhost:3000/api/addRow')
+                                .send({ '1ssxss': 'sdafqwe', 'tableId': tableId })
+                                .end((err, res) => {
+
+                                    let rowId = res.body.rowId;
+                                    expect(res.body.status).to.equal(1);
+                                    requestwebapi
+                                        .post('http://localhost:3000/api/getRow')
+                                        .send({ 'rowId': rowId, 'tableId': tableId })
+                                        .end((err, res) => {
+                                            expect(res.body.row['1ssxss']).to.equal('sdafqwe');
+                                            expect(res.body.status).to.equal(1);
+                                            let end = Date.now();
+                                            console.log(`1:${end - start}`);
+                                            test();
+                                        })
+                                })
+                        })
+                })
+        }
+        
+    })*/
     after(() => {
         child.kill();
     })

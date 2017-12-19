@@ -5,6 +5,7 @@ import { SyncTaskArray } from "../../../../utility/class/flow/SyncTaskArray";
 import { HandleCallback } from "../../../../utility/class/flow/handleCallback";
 import { Util, ParserString } from '../../../../utility/class/Util';
 import { KeyTableValue } from '../schema/KeySchema';
+import { isNullOrUndefined } from "util";
 
 
 /**
@@ -42,19 +43,21 @@ export class TableRow extends CRUDEntity {
             validContent = {};
         if (typeof content === 'object') {
             for (let key in this._keyTable) {
-                if (this._keyTable.hasOwnProperty(key) && content.hasOwnProperty(key) === false) {
-                    if (this._keyTable[key].isRequired === true) {
-                        errKey = key;
-                        isOk = false;
-                        break;
-                    }
-                } else {
-                    let out = _setValidContent.call(this, key);
-                    if (out !== 'ok') {
-                        errType = out;
-                        errKey = key;
-                        isOk = false;
-                        break;
+                if (this._keyTable.hasOwnProperty(key)) {
+                    if (content.hasOwnProperty(key) === false) {
+                        if (this._keyTable[key].isRequired === true) {
+                            errKey = key;
+                            isOk = false;
+                            break;
+                        }
+                    } else {
+                        let out = _setValidContent.call(this, key);
+                        if (out !== 'ok') {
+                            errType = out;
+                            errKey = key;
+                            isOk = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -74,9 +77,19 @@ export class TableRow extends CRUDEntity {
             let type = this._keyTable[key].type;
             if (Util.validValue(type, content, key)) {
                 if (type === 'any') {
+                    let old = this.getValue(key);
+                    old = isNullOrUndefined(old) ? {} : old;
+                    for (const name in content[key]) {
+                        if (content[key].hasOwnProperty(name)) {
+                            const value = content[key][name];
+                            old[name] = value;
+                        }
+                    }
                     this._document.markModified(key);
+                    validContent[key] = old;
+                } else {
+                    validContent[key] = content[key];
                 }
-                validContent[key] = content[key];
                 return 'ok';
             } else {
                 return type;
@@ -86,6 +99,10 @@ export class TableRow extends CRUDEntity {
 
     clone(callback: (err: IError, param: any) => void) {
 
+    }
+
+    getValue(key: string): any {
+        return this._document.get(key);
     }
 
     getContent(): any {

@@ -4,6 +4,7 @@ import { KeyValueTableService } from '../../domainServices/CRUDServices/keyValue
 import { KeyType } from "../../domainServices/CRUDServices/keyValueTable/schema/KeySchema";
 import { Util } from '../../utility/class/Util';
 import { TableRow } from '../../domainServices/CRUDServices/keyValueTable/repository/TableRowRepository';
+import { UserError } from '../../utility/class/UserError';
 
 export const api = Router();
 
@@ -17,10 +18,10 @@ api.post('/createTable', (req, res) => {
                 if (name && /\w+/i.exec(name)[0] === name) {
                     tasks.next();
                 } else {
-                    tasks.next({
+                    tasks.next(new UserError({
                         name: 'createTable请求缺少参数,或参数不合法',
                         message: `name:${name}`
-                    })
+                    }))
                 }
             },
             () => {
@@ -90,9 +91,9 @@ api.post('/addKey', (req, res) => {
 });
 
 api.post('/addRow', (req, res) => {
-    let content = {},
+    let row: TableRow,
         tableId: string,
-        row: TableRow;
+        content = {};
     const tasks = new SyncTaskArray({
         array: [
             () => {
@@ -162,6 +163,53 @@ api.post('/getRow', (req, res) => {
             () => {
                 res.json({
                     row: row.getContent(),
+                    status: 1
+                })
+            }
+        ],
+        callback: (err) => {
+            res.json({
+                error: err,
+                status: 0
+            })
+        }
+    });
+});
+
+api.post('/updateRow', (req, res) => {
+    let row: TableRow,
+        rowId: string, tableId: string,
+        content = {};
+    const tasks = new SyncTaskArray({
+        array: [
+            () => {
+                tableId = req.body.tableId;
+                rowId = req.body.rowId;
+                if (tableId && rowId) {
+                    let body = req.body;
+                    for (const key in body) {
+                        if (body.hasOwnProperty(key)) {
+                            const value = body[key];
+                            content[key] = value;
+                        }
+                    }
+                    tasks.next();
+                } else {
+                    tasks.next({
+                        name: 'updateRow请求缺少参数',
+                        message: `tableId:${tableId},rowId:{rowId}`
+                    })
+                }
+            },
+            () => {
+                KeyValueTableService.updateRow((err, tableRow) => {
+                    row = tableRow;
+                    tasks.next(err);
+                }, tableId, rowId, content)
+            },
+            () => {
+                res.json({
+                    rowId: row.id,
                     status: 1
                 })
             }

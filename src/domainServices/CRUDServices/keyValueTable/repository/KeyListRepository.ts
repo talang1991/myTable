@@ -2,6 +2,8 @@ import { CRUDEntity } from "../../utility/CRUDEntity";
 import { KeyTalbe, KeyType, KeyIndex, KeyTableValue } from '../schema/KeySchema';
 import { Util } from '../../../../utility/class/Util';
 import { IError } from "../../../../utility/interface/IError";
+import { UserError } from '../../../../utility/class/UserError';
+import { LockService } from "../../../../utility/class/service/LockService";
 interface KeyListContent {
     keyArray: KeyType[]
     keyTable: { [name: string]: KeyTableValue }
@@ -90,10 +92,16 @@ export class KeyList extends CRUDEntity {
                 this._keyArray[index].name = name;
                 this._saveEntity(callback);
             } else {
-                callback({ name: 'KeyListRepository->setKeyName错误', message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$` })
+                callback(new UserError({
+                    name: 'KeyListRepository->setKeyName错误',
+                    message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$`
+                }))
             }
         } else {
-            callback({ name: 'KeyListRepository->setKeyName错误', message: 'keys数组内已有该名称key' })
+            callback(new UserError({
+                name: 'KeyListRepository->setKeyName错误',
+                message: 'keys数组内已有该名称key'
+            }))
         }
     }
 
@@ -109,7 +117,10 @@ export class KeyList extends CRUDEntity {
             }
             this._saveEntity(callback)
         } else {
-            callback({ name: 'KeyListRepository->moveKeyPrev错误', message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$` })
+            callback(new UserError({
+                name: 'KeyListRepository->moveKeyPrev错误',
+                message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$`
+            }))
         }
     }
 
@@ -125,25 +136,28 @@ export class KeyList extends CRUDEntity {
             }
             this._saveEntity(callback)
         } else {
-            callback({ name: 'KeyListRepository->moveKeyNext错误', message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$` })
+            callback(new UserError({
+                name: 'KeyListRepository->moveKeyNext错误',
+                message: `数组下标越界：${index},keys数组长度：${this._keyArray.length}$`
+            }))
         }
     }
 
     addKey(callback: (err: IError) => void, key: KeyType) {
         const type = this._getKeyType(key.keyType);
         if (type === false) {
-            callback({
+            callback(new UserError({
                 name: 'KeyListRepository->addKey错误',
                 message: `key类型错误：${key.keyType}`
-            })
+            }));
         } else {
             if (this._validKeyExtraAttr(key)) {
                 this._addKey(key, callback)
             } else {
-                callback({
+                callback(new UserError({
                     name: 'KeyListRepository->addKey错误',
                     message: `key.defaultValue(${key.keyType}):${key.defaultValue},key.isVisible:${key.isVisible},key.isRequired:${key.isRequired}.`
-                })
+                }));
             }
         }
     }
@@ -196,7 +210,12 @@ export class KeyList extends CRUDEntity {
             this._keyTable = {};
             this.__addKey(key);
         }
-        this._saveEntity(callback);
+        LockService.initLock('KeyList->addKey', () => {
+            this._saveEntity((err) => {
+                LockService.unlock('KeyList->addKey')
+                callback(err);
+            });
+        })
     }
 
     private _validKeyExtraAttr(key: KeyType): boolean {

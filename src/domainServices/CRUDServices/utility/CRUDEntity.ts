@@ -3,6 +3,7 @@ import { SyncTaskArray } from '../../../utility/class/flow/SyncTaskArray';
 import { ICRUDEntity } from '../../../utility/interface/entity/ICRUDEntity';
 import { createHash } from "crypto";
 import { IError } from '../../../utility/interface/IError';
+import { UserError } from "../../../utility/class/UserError";
 /**
  * 这是一个CRUD实体对象的抽象基类
  * 
@@ -71,7 +72,7 @@ export abstract class CRUDEntity implements ICRUDEntity {
                 this._document = res;
                 this._callback(err);
             } else {
-                this._callback({ name: "未找到相应ID实体", message: "请确认相应实体ID" });
+                this._callback(new UserError({ name: "未找到相应ID实体", message: "请确认相应实体ID" }));
             }
         });
     }

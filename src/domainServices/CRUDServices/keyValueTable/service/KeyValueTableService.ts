@@ -9,6 +9,7 @@ import { createHash } from 'crypto';
 import { HandleCallback } from '../../../../utility/class/flow/handleCallback';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
 import { MemoryCache } from '../../../memoryCacheServices/repository/MemoryCacheRepository';
+import { UserError } from '../../../../utility/class/UserError';
 
 interface TableCache {
     keylist: KeyList
@@ -169,10 +170,10 @@ function _getTableCache(callback: (err: IError, table: TableCache) => void, keyL
                         if (keyList) {
                             tableName = keyList.tableName;
                             if (tableName === undefined) {
-                                err = {
+                                err = new UserError({
                                     name: "此ID的keyList没有创建过数据表",
                                     message: "请用初始该keyList创建数据表"
-                                }
+                                });
                             }
                         }
                         tasks.next(err);

@@ -37,7 +37,6 @@ app.use(session({
     })
 }));
 
-
 app.use('/api', api);
 
 // catch 404 and forward to error handler

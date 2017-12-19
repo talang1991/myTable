@@ -1,5 +1,6 @@
 import { HandleCallback } from './handleCallback';
 import { IError } from '../../interface/IError';
+import { isFunction } from 'util';
 
 interface ICallbackParam {
     array: (() => void)[]
@@ -10,6 +11,8 @@ interface ICallbackParam {
 export class SyncTaskArray {
 
     private _param: ICallbackParam
+
+    private _currentTask: () => void
 
     constructor(param: ICallbackParam, notAuto?: boolean) {
         this._param = param;
@@ -28,11 +31,11 @@ export class SyncTaskArray {
         let callback = this._param.callback, array = this._param.array;
         HandleCallback.handleWithOneParam(err, callback, () => {
             if (array.length !== 0) {
-                var curentTask = array.shift();
-                if (curentTask) {
-                    curentTask();
-                };
-            };
+                this._currentTask = array.shift();
+                if (isFunction(this._currentTask)) {
+                    this._currentTask();
+                }
+            }
         })
     }
 

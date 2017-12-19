@@ -1,19 +1,12 @@
 import { IError } from '../interface/IError';
 export class UserError implements IError {
-    private _name: string
-    private _message: string
 
-    public get name(): string {
-        return this.name;
-    }
+    public name: string
 
-    public get message(): string {
-        return this._message;
-    }
-
+    public message: string
 
     constructor(err: IError) {
-        this._name = err.name;
-        this._message = err.message;
+        this.name = err.name;
+        this.message = err.message;
     }
 }

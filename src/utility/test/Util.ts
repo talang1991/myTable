@@ -21,7 +21,7 @@ export class TestService {
 
     private _condition(dbNum: any = ''): boolean {
         try {
-            connect(`mongodb://localhost/table-tests${dbNum}`, { useMongoClient: true });
+            connect(`mongodb://localhost/${setting.testDBName}${dbNum}`, { useMongoClient: true });
             this._startTest = true;
         } catch (error) {
             if (this._isDefaultDB === false) {

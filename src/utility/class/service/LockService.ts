@@ -48,7 +48,7 @@ class Lock {
         if (this._isLocked()) {
             this._waitTimes++;
             setTimeout(() => {
-                console.log(`${this._name}_wait_${this._waitTimes}`)
+                //console.log(`${this._name}_wait_${this._waitTimes}`)
                 this._wait();
             }, 100);
         } else {

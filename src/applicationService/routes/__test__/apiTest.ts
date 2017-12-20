@@ -28,7 +28,7 @@ describe("数据表服务类api接口测试", () => {
                     console.log(end - start)
                     done()
                 })
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 200; i++) {
                 tasks.add(() => {
                     testFunc(() => tasks.ckeck());
                 })
@@ -78,7 +78,7 @@ describe("数据表服务类api接口测试", () => {
                                     let rowId = res.body.rowId;
                                     expect(res.body.status).to.equal(1);
                                     callback();
-                                    /* requestwebapi
+                                    requestwebapi
                                         .post('http://localhost:3000/api/updateRow')
                                         .send({ 'rowId': rowId, 'tableId': tableId, '3ssXss': { ccc: 'sdasd' }, '1ssXss': { sss: 'qwe' } })
                                         .end((err, res) => {
@@ -94,7 +94,7 @@ describe("数据表服务类api接口测试", () => {
                                                     expect(res.body.status).to.equal(1);
                                                     callback();
                                                 })
-                                        }) */
+                                        })
                                 })
                         })
                 })
@@ -124,7 +124,6 @@ describe("数据表服务类api接口测试", () => {
                                     .post('http://localhost:3000/api/getRow')
                                     .send({ 'rowId': rowId, 'tableId': tableId })
                                     .end((err, res) => {
-
                                         expect(res.body.row['1ssxss'].sss).to.equal(111);
                                         expect(res.body.status).to.equal(1);
                                         done();

@@ -4,7 +4,6 @@ import { IError } from '../../../../utility/interface/IError';
 import { Model, Document } from 'mongoose';
 import { KeyType } from '../schema/KeySchema';
 import { MemoryCacheService } from '../../../memoryCacheServices/service/MemoryCacheService';
-import { TableModelFactorty } from '../factory/TableModelFactorty';
 import { createHash } from 'crypto';
 import { HandleCallback } from '../../../../utility/class/flow/handleCallback';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
@@ -51,56 +50,6 @@ function _getKeyListByCacheOrDB(callback: (err: IError, keyList: KeyList) => voi
     }
 }
 
-function _addTableKey(callback: (err: IError) => void, keyListId: string, key: KeyType): void {
-    let table: Model<Document>;
-    const tasks = new SyncTaskArray({
-        array: [
-            () => {
-                _getTableCache((err, tableCache) => {
-                    if (tableCache) {
-                        table = tableCache.model;
-                    }
-                    tasks.next(err);
-                }, keyListId)
-            },
-            () => {
-                let schemaObj = {};
-                if (key.defaultValue) {
-                    schemaObj[key.name] = {
-                        type: TableModelFactorty.getSchemaType(key.keyType),
-                        default: key.defaultValue
-                    };
-                } else {
-                    schemaObj[key.name] = TableModelFactorty.getSchemaType(key.keyType);
-                }
-                table.schema.add(schemaObj);
-                tasks.end(null);
-            }
-        ],
-        callback: callback
-    });
-}
-
-function _removeTableKey(callback: (err: IError) => void, keyListId: string, keyName: string) {
-    let table: Model<Document>;
-    const tasks = new SyncTaskArray({
-        array: [
-            () => {
-                _getTableCache((err, tableCache) => {
-                    if (tableCache) {
-                        table = tableCache.model;
-                    }
-                    tasks.next(err);
-                }, keyListId)
-            },
-            () => {
-                table.schema.remove(keyName);
-                tasks.end(null);
-            }
-        ],
-        callback: callback
-    });
-}
 
 function _setKeyListInCache(keyListId: string, keyList: KeyList): void {
     MemoryCacheService
@@ -116,26 +65,6 @@ function _createKeyList(callback: (err: IError, keyList: KeyList) => void): void
     }, null);
 }
 
-function _createTable(name: string, keyListId: string, callback: (err: IError) => void): void {
-    _getKeyListByCacheOrDB((err, list) => {
-        HandleCallback.handleWithOneParam(err, callback, () => {
-            __createTable(list, name);
-            list.setTableName((err) => {
-                callback(err);
-            }, name);
-        })
-    }, keyListId);
-    function __createTable(keyList: KeyList, name: string) {
-        MemoryCacheService
-            .getCache('keyValueTable_tables')
-            .setValue(name, {
-                keylist: keyList,
-                model: TableModelFactorty
-                    .create(name, keyList.keyTable, keyList.keyIndexTable)
-            });
-    }
-
-}
 
 function _updateTable(table: TableCache, keyListId: string, callback: (err: IError) => void): void {
     let keyList: KeyList
@@ -148,9 +77,6 @@ function _updateTable(table: TableCache, keyListId: string, callback: (err: IErr
                 }, keyListId)
             },
             () => {
-                let keyArray = keyList.keyArray,
-                    schema = table.model.schema;
-                TableModelFactorty.update(schema, keyList, keyList.keyIndexTable);
                 _setKeyListInCache(keyListId, keyList);
                 tasks.end(null);
             }
@@ -159,62 +85,20 @@ function _updateTable(table: TableCache, keyListId: string, callback: (err: IErr
     });
 }
 
-function _getTableCache(callback: (err: IError, table: TableCache) => void, keyListId: string): void {
-    let tableName: string,
-        table: TableCache;
-    const tasks = new SyncTaskArray({
-        array: [
-            () => {
-                _getKeyListByCacheOrDB((err, keyList) => {
-                    HandleCallback.handleWithOneParam(err, callback, () => {
-                        if (keyList) {
-                            tableName = keyList.tableName;
-                            if (tableName === undefined) {
-                                err = new UserError({
-                                    name: "此ID的keyList没有创建过数据表",
-                                    message: "请用初始该keyList创建数据表"
-                                });
-                            }
-                        }
-                        tasks.next(err);
-                    })
-                }, keyListId)
-            },
-            () => {
-                table = _getTableByCache(tableName);
-                if (table === undefined) {
-                    _createTable(tableName, keyListId, (err) => {
-                        tasks.next(err);
-                    });
-                } else {
-                    tasks.next();
-                }
-            },
-            () => {
-                if (table === undefined) {
-                    table = _getTableByCache(tableName);
-                }
-                callback(null, table);
-            }
-        ],
-        callback: callback
-    });
-}
-
 function _getTableRow(callback: (err: IError, tableRow: TableRow) => void, keyListId: string, rowId: string) {
-    let table: TableCache;
+    let keyList: KeyList;
     const tasks = new SyncTaskArray({
         array: [
             () => {
-                _getTableCache((err, tableCache) => {
-                    table = tableCache;
+                _getKeyListByCacheOrDB((err, kl) => {
+                    keyList = kl;
                     tasks.next(err);
                 }, keyListId)
             },
             () => {
                 const row = new TableRow((err) => {
                     callback(err, row)
-                }, table.model, rowId, table.keylist.keyTable);
+                }, rowId, keyList.keyTable, keyList.tableName);
             }
         ],
         callback: callback
@@ -229,7 +113,6 @@ export class KeyValueTableService {
                 .update((new Date().toDateString() + Math.random().toString(8)))
                 .digest("base64"),
             finalName = `${name}_${extraName}`,
-            keyListId: string,
             keyList: KeyList;
         const tasks = new SyncTaskArray({
             array: [
@@ -241,13 +124,7 @@ export class KeyValueTableService {
                 },
                 () => {
                     _setKeyListInCache(keyList.id, keyList);
-                    keyListId = keyList.id;
-                    tasks.next(null);
-                },
-                () => {
-                    _createTable(finalName, keyListId, (err) => {
-                        callback(err, keyListId);
-                    });
+                    callback(null, keyList.id);
                 }
             ],
             callback: callback
@@ -256,25 +133,7 @@ export class KeyValueTableService {
 
     static updateTable(callback: (err: IError) => void, tableName: string, tableId: string): void {
         let table: TableCache
-        const tasks = new SyncTaskArray({
-            array: [
-                () => {
-                    table = _getTableByCache(tableName);
-                    if (table === undefined) {
-                        _getTableCache((err, tableCache) => {
-                            table = tableCache;
-                            tasks.next(err);
-                        }, tableId)
-                    } else {
-                        tasks.next();
-                    }
-                },
-                () => {
-                    _updateTable(table, tableId, callback);
-                }
-            ],
-            callback: callback
-        });
+        _updateTable(table, tableId, callback);
     }
 
     static addKey(callback: (err: IError) => void, key: KeyType, tableId: string): void {
@@ -294,9 +153,7 @@ export class KeyValueTableService {
                 },
                 () => {
                     _setKeyListInCache(tableId, keyList);
-                    _addTableKey((err) => {
-                        tasks.end(err)
-                    }, tableId, key);
+                    tasks.end();
                 }
             ],
             callback: callback
@@ -320,9 +177,7 @@ export class KeyValueTableService {
                 },
                 () => {
                     _setKeyListInCache(tableId, keyList);
-                    _removeTableKey((err) => {
-                        tasks.end(err)
-                    }, tableId, keyName);
+                    tasks.end();
                 }
             ],
             callback: callback
@@ -330,20 +185,19 @@ export class KeyValueTableService {
     }
 
     static addRow(callback: (err: IError, row: TableRow) => void, tableId: string, content: any): void {
-        let table: TableCache,
-            tableName: string;
+        let keyList: KeyList;
         const tasks = new SyncTaskArray({
             array: [
                 () => {
-                    _getTableCache((err, tableCache) => {
-                        table = tableCache;
+                    _getKeyListByCacheOrDB((err, kl) => {
+                        keyList = kl;
                         tasks.next(err);
                     }, tableId)
                 },
                 () => {
                     const row = new TableRow((err) => {
                         callback(err, row);
-                    }, table.model, content, table.keylist.keyTable);
+                    }, content, keyList.keyTable, keyList.tableName);
                 }
             ],
             callback: callback

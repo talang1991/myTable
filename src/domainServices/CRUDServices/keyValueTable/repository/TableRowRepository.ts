@@ -6,6 +6,8 @@ import { HandleCallback } from "../../../../utility/class/flow/handleCallback";
 import { Util, ParserString } from '../../../../utility/class/Util';
 import { KeyTableValue } from '../schema/KeySchema';
 import { isNullOrUndefined } from "util";
+import { ValueTable } from '../schema/TableRowSchema';
+import { createHash } from "crypto";
 
 
 /**
@@ -16,31 +18,48 @@ import { isNullOrUndefined } from "util";
  * @extends {CRUDEntity}
  */
 export class TableRow extends CRUDEntity {
+    private _tableRowId: string
     private _keyListId: string
     private _keyTable: { [name: string]: KeyTableValue }
-    constructor(callback: (err: IError) => void, model: Model<Document>, id: string, keysObj: Object);
-    constructor(callback: (err: IError) => void, model: Model<Document>, content: any, keysObj: Object);
+    private _tableName: string
+    constructor(callback: (err: IError) => void, id: string, keysObj: Object, tableName: string);
+    constructor(callback: (err: IError) => void, content: any, keysObj: Object, tableName: string);
     constructor() {
         let callback = arguments[0],
             model = arguments[1];
-        super(model, (err) => {
+        super(ValueTable, (err) => {
             HandleCallback.handleWithOneParam(err, callback, () => {
                 this._keyListId = this._document.get('keyListsId');
+                if (this._tableRowId === undefined) {
+                    this._tableRowId = this._document.get('tableRow')._id;
+                }
                 callback();
             })
-        }, arguments[2]);
-        this._keyTable = arguments[3];
+        }, arguments[1]);
+        this._keyTable = arguments[2];
+        this._tableName = arguments[3];
     }
 
     get keysListId(): string {
         return this._keyListId;
+    }
+    private _getTableRow(): any {
+        return this._document.get('tableRow');
+    }
+
+    protected _setId(): void {
+        let md5 = createHash('md5');
+        this._tableRowId = md5.update((this._tableName + new Date().toDateString() + Math.random().toString(8))).digest('base64');
+        this._document.set('tableRow', { _id: this._tableRowId });
+        this._document.set('tableName', this._tableName);
+        super._setId();
     }
 
     protected _setEntity(content: Object, callback: (err?: IError) => void): void {
         let isOk = true,
             errKey,
             errType: any = 1,
-            validContent = {};
+            validRowContent = this._getTableRow();
         if (typeof content === 'object') {
             for (let key in this._keyTable) {
                 if (this._keyTable.hasOwnProperty(key)) {
@@ -49,9 +68,14 @@ export class TableRow extends CRUDEntity {
                             errKey = key;
                             isOk = false;
                             break;
+                        } else if (this._keyTable[key].defaultValue) {
+                            let oldValue = this.getValue(key);
+                            if (!oldValue) {
+                                validRowContent[key] = this._keyTable[key].defaultValue;
+                            }
                         }
                     } else {
-                        let out = _setValidContent.call(this, key);
+                        let out = _setValidRowContent.call(this, key);
                         if (out !== 'ok') {
                             errType = out;
                             errKey = key;
@@ -66,14 +90,15 @@ export class TableRow extends CRUDEntity {
             isOk = false;
         }
         if (isOk) {
-            super._setEntity(validContent, callback);
+            this._document.markModified('tableRow');
+            super._setEntity({ tableRow: validRowContent }, callback);
         } else {
             callback({
                 name: 'TableRowRepository->_setEntity错误',
                 message: `${errType !== 1 ? `content内容验证失败_${errType}` : 'content缺失内容'}：${errKey}:${content ? content[errKey] : ''}!`
             });
         }
-        function _setValidContent(this: TableRow, key: string): string {
+        function _setValidRowContent(this: TableRow, key: string): string {
             let type = this._keyTable[key].type;
             if (Util.validValue(type, content, key)) {
                 if (type === 'any') {
@@ -85,10 +110,9 @@ export class TableRow extends CRUDEntity {
                             old[name] = value;
                         }
                     }
-                    this._document.markModified(key);
-                    validContent[key] = old;
+                    validRowContent[key] = old;
                 } else {
-                    validContent[key] = content[key];
+                    validRowContent[key] = content[key];
                 }
                 return 'ok';
             } else {
@@ -102,15 +126,18 @@ export class TableRow extends CRUDEntity {
     }
 
     getValue(key: string): any {
-        return this._document.get(key);
+        let tableRow = this._document.get('tableRow');
+        return tableRow ? tableRow[key] : null;
     }
 
+
     getContent(): any {
-        let row = {}
-        if (this._document) {
+        let row = {},
+            tableRow = this._getTableRow();
+        if (this._document && tableRow) {
             for (const key in this._keyTable) {
                 if (this._keyTable.hasOwnProperty(key)) {
-                    row[key] = this._document.get(key);
+                    row[key] = tableRow[key];
                 }
             }
         }

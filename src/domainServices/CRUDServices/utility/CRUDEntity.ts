@@ -60,7 +60,7 @@ export abstract class CRUDEntity implements ICRUDEntity {
         }
     }
 
-    private _setId(): void {
+    protected _setId(): void {
         let md5 = createHash('md5');
         this._id = md5.update((new Date().toDateString() + Math.random().toString(8))).digest('base64');
         this._document.set('_id', this._id);

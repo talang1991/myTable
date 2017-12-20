@@ -27,7 +27,6 @@ describe("键值对数据表服务类更新表方法测试", () => {
                             done()
                         });
                         worker.send({
-                            tableName: keyList.tableName,
                             keyListId: keyListId
                         });
                     }, { name: 'vvv', keyType: 'str', defaultValue: 'xxxxx' }, keyListId)

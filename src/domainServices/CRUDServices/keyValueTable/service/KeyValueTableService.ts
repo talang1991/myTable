@@ -4,7 +4,6 @@ import { IError } from '../../../../utility/interface/IError';
 import { Model, Document } from 'mongoose';
 import { KeyType } from '../schema/KeySchema';
 import { MemoryCacheService } from '../../../memoryCacheServices/service/MemoryCacheService';
-import { createHash } from 'crypto';
 import { HandleCallback } from '../../../../utility/class/flow/handleCallback';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
 import { MemoryCache } from '../../../memoryCacheServices/repository/MemoryCacheRepository';
@@ -98,7 +97,7 @@ function _getTableRow(callback: (err: IError, tableRow: TableRow) => void, keyLi
             () => {
                 const row = new TableRow((err) => {
                     callback(err, row)
-                }, rowId, keyList.keyTable, keyList.tableName);
+                }, rowId, keyList);
             }
         ],
         callback: callback
@@ -108,12 +107,7 @@ function _getTableRow(callback: (err: IError, tableRow: TableRow) => void, keyLi
 export class KeyValueTableService {
 
     static createTable(callback: (err: IError, tableId: string) => void, name: string): void {
-        let md5 = createHash('md5'),
-            extraName = md5
-                .update((new Date().toDateString() + Math.random().toString(8)))
-                .digest("base64"),
-            finalName = `${name}_${extraName}`,
-            keyList: KeyList;
+        let keyList: KeyList;
         const tasks = new SyncTaskArray({
             array: [
                 () => {
@@ -124,7 +118,9 @@ export class KeyValueTableService {
                 },
                 () => {
                     _setKeyListInCache(keyList.id, keyList);
-                    callback(null, keyList.id);
+                    keyList.setTableName((err) => {
+                        callback(err, keyList.id);
+                    }, name)
                 }
             ],
             callback: callback
@@ -197,7 +193,7 @@ export class KeyValueTableService {
                 () => {
                     const row = new TableRow((err) => {
                         callback(err, row);
-                    }, content, keyList.keyTable, keyList.tableName);
+                    }, content, keyList);
                 }
             ],
             callback: callback

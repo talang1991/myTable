@@ -4,17 +4,18 @@
  * @export
  * @class LockService
  */
+const locks: { [name: string]: boolean } = {};
+
 export class LockService {
-    static locks: { [name: string]: boolean } = {};
     static initLock(name: string, callback: () => void): void {
-        if (LockService.locks[name] === undefined) {
-            LockService.locks[name] = false;
+        if (locks[name] === undefined) {
+            locks[name] = false;
         }
         new Lock(name, callback);
     }
 
     static unlock(name: string): void {
-        LockService.locks[name] = false;
+        locks[name] = false;
     }
 }
 
@@ -37,11 +38,11 @@ class Lock {
     private _callback: () => void;
 
     private _lock(): void {
-        LockService.locks[this._name] = true;
+        locks[this._name] = true;
     }
 
     private _isLocked(): boolean {
-        return LockService.locks[this._name];
+        return locks[this._name];
     }
 
     private _wait(): void {

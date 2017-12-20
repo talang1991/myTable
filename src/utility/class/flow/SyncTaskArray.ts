@@ -14,13 +14,11 @@ export class SyncTaskArray {
 
     private _currentTask: () => void
 
-    constructor(param: ICallbackParam, notAuto?: boolean) {
+    constructor(param: ICallbackParam) {
         this._param = param;
-        if (notAuto === undefined) {
-            setTimeout(() => {
-                this._run();
-            });
-        }
+        setTimeout(() => {
+            this._run();
+        });
     }
 
     private _run() {

@@ -210,9 +210,10 @@ export class KeyList extends CRUDEntity {
             this._keyTable = {};
             this.__addKey(key);
         }
-        LockService.initLock(`KeyList:${this.id}->addKey`, () => {
+        const lockName = `KeyList:${this.id}->addKey`;
+        LockService.initLock(lockName, () => {
             this._saveEntity((err) => {
-                LockService.unlock(`KeyList:${this.id}->addKey`)
+                LockService.unlock(lockName)
                 callback(err);
             });
         })

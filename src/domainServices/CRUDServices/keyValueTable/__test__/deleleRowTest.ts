@@ -5,12 +5,12 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { setting } from '../../../../utility/config/setting';
-import { TableRow } from '../repository/TableRowRepository';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
+import { ITableRow } from '../../../../utility/interface/entity/ITableRow';
 
 describe("键值对数据表服务类删除行方法测试", () => {
     it("手动新建表后添加行又删除行，则通过getRow不能得到相应行信息", (done) => {
-        let listId, rowId, row: TableRow;
+        let listId, rowId, row: ITableRow;
         let test = function () {
             const tasks = new SyncTaskArray({
                 array: [

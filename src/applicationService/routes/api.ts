@@ -3,8 +3,8 @@ import { SyncTaskArray } from '../../utility/class/flow/SyncTaskArray';
 import { KeyValueTableService } from '../../domainServices/CRUDServices/keyValueTable/service/KeyValueTableService';
 import { KeyType } from "../../domainServices/CRUDServices/keyValueTable/schema/KeySchema";
 import { Util } from '../../utility/class/Util';
-import { TableRow } from '../../domainServices/CRUDServices/keyValueTable/repository/TableRowRepository';
 import { UserError } from '../../utility/class/UserError';
+import { ITableRow } from '../../utility/interface/entity/ITableRow';
 
 export const api = Router();
 
@@ -91,7 +91,7 @@ api.post('/addKey', (req, res) => {
 });
 
 api.post('/addRow', (req, res) => {
-    let row: TableRow,
+    let row: ITableRow,
         tableId: string,
         content = {};
     const tasks = new SyncTaskArray({
@@ -138,7 +138,7 @@ api.post('/addRow', (req, res) => {
 
 api.post('/getRow', (req, res) => {
     let tableId: string,
-        row: TableRow,
+        row: ITableRow,
         rowId: string;
     const tasks = new SyncTaskArray({
         array: [
@@ -177,7 +177,7 @@ api.post('/getRow', (req, res) => {
 });
 
 api.post('/updateRow', (req, res) => {
-    let row: TableRow,
+    let row: ITableRow,
         rowId: string, tableId: string,
         content = {};
     const tasks = new SyncTaskArray({

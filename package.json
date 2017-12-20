@@ -6,7 +6,7 @@
     "author": "",
     "license": "ISC",
     "scripts": {
-        "test": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
+        "test": "./node_modules/.bin/mocha -t 6000 -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
         "testC": "./node_modules/.bin/mocha -t 5000*5000*5000 -r ./node_modules/ts-node/register src/**/__test__/**/apiTest.ts",
         "testX": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register test.ts"
     },

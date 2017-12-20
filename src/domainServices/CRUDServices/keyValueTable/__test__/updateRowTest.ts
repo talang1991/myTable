@@ -5,11 +5,11 @@ import { expect } from "chai";
 import { disconnect } from 'mongoose';
 import { TestService } from '../../../../utility/test/Util';
 import { SyncTaskArray } from '../../../../utility/class/flow/SyncTaskArray';
-import { TableRow } from '../repository/TableRowRepository';
+import { ITableRow } from '../../../../utility/interface/entity/ITableRow';
 
 describe("键值对数据表服务类更新行方法测试", () => {
     it("手动新建表后更新行，且通过getRow能得到相应行信息", (done) => {
-        let listId, rowId, row: TableRow;
+        let listId, rowId, row: ITableRow;
         let test = function () {
             const tasks = new SyncTaskArray({
                 array: [

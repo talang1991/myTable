@@ -1,5 +1,5 @@
 import { CRUDEntity } from "../../utility/CRUDEntity";
-import { KeyTalbe, KeyType, KeyIndex, KeyTableValue } from '../schema/KeySchema';
+import { KeyModel, KeyType, KeyIndex, KeyTableValue } from '../schema/KeySchema';
 import { Util } from '../../../../utility/class/Util';
 import { IError } from "../../../../utility/interface/IError";
 import { UserError } from '../../../../utility/class/UserError';
@@ -26,7 +26,7 @@ export class KeyList extends CRUDEntity {
     constructor(callback: (err: IError) => void, content: KeyListContent);
     constructor() {
         let callback = arguments[0]
-        super(KeyTalbe, (err) => {
+        super(KeyModel, (err) => {
             if (err) {
                 callback(err);
             } else {

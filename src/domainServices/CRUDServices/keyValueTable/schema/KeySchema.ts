@@ -35,4 +35,4 @@ let KeySchema = new Schema({
 
 KeySchema.index({ _id: 1 });
 
-export let KeyTalbe = model('KeyTalbe', KeySchema);
+export let KeyModel = model('key', KeySchema);

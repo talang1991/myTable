@@ -11,19 +11,21 @@ describe("键值对数据表服务类添加行方法测试", () => {
     let id;
     it("手动新建表后添加行，且通过getRow能得到相应行信息", (done) => {
         let test = function () {
-            KeyValueTableService.createTable((err, keyListId) => {
-                id = keyListId;
-                KeyValueTableService.addKey((err) => {
-                    KeyValueTableService.addKey((err) => {
+            KeyValueTableService.createTable((err, tableId) => {
+                id = tableId;
+                KeyValueTableService.addKey((err, tableId) => {
+                    id = tableId;
+                    KeyValueTableService.addKey((err, tableId) => {
+                        id = tableId;
                         KeyValueTableService.addRow((err, row) => {
                             let rowC = row.getContent();
                             expect(rowC.ttt.getTime()).to.equal(new Date('2017-11-22').getTime());
                             expect(rowC.CCC).to.equal('ffff');
                             disconnect();
                             done()
-                        }, keyListId, { ttt: '2017-11-22' })
-                    }, { name: 'CCC', keyType: 'str', defaultValue: 'ffff' }, keyListId)
-                }, { name: 'ttt', keyType: 'date', isRequired: true }, keyListId)
+                        }, tableId, { ttt: '2017-11-22' })
+                    }, { name: 'CCC', keyType: 'str', defaultValue: 'ffff' }, tableId)
+                }, { name: 'ttt', keyType: 'date', isRequired: true }, tableId)
             }, 'xxx')
         }
         new TestService(test, true);

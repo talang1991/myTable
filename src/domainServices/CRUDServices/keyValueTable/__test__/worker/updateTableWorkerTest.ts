@@ -9,7 +9,7 @@ import * as mongoose from "mongoose";
 process.on('message', function (m) { //接收主进程发送过来的消息
     connect(`mongodb://localhost/${setting.testDBName}`, { useMongoClient: true }).then(() => {
         KeyValueTableService.updateTable((err) => {
-            let keylist: KeyList = MemoryCacheService.getCache(setting.keyValueTableCache.keyList).getValue(m.keyListId);
+            let keylist: KeyList = MemoryCacheService.getCache(setting.keyValueTableCache.keyList).getValue(m.tableId);
             KeyValueTableService.addRow((err, row) => {
                 let rowC;
                 if (row) {
@@ -20,7 +20,7 @@ process.on('message', function (m) { //接收主进程发送过来的消息
                     row: rowC
                 });
             }, keylist.id, { ddd: '2017-11-21' })
-        }, m.tableName, m.keyListId)
+        }, m.tableId)
     });
 });
 

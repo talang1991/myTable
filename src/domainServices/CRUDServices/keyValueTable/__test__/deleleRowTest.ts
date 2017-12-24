@@ -15,18 +15,18 @@ describe("键值对数据表服务类删除行方法测试", () => {
             const tasks = new SyncTaskArray({
                 array: [
                     () => {
-                        KeyValueTableService.createTable((err, keyListId) => {
-                            listId = keyListId;
-                            KeyValueTableService.addKey((err) => {
-                                KeyValueTableService.addKey((err) => {
+                        KeyValueTableService.createTable((err, tableId) => {
+                            listId = tableId;
+                            KeyValueTableService.addKey((err, tableId) => {
+                                KeyValueTableService.addKey((err, tableId) => {
                                     KeyValueTableService.addRow((err, row) => {
                                         if (row) {
                                             rowId = row.id;
                                         }
                                         tasks.next(err)
-                                    }, keyListId, { ttt: '2017-11-22' })
-                                }, { name: 'CCC', keyType: 'str', defaultValue: 'ffff' }, keyListId)
-                            }, { name: 'ttt', keyType: 'date', isRequired: true }, keyListId)
+                                    }, tableId, { ttt: '2017-11-22' })
+                                }, { name: 'CCC', keyType: 'str', defaultValue: 'ffff' }, tableId)
+                            }, { name: 'ttt', keyType: 'date', isRequired: true }, tableId)
                         }, 'xxx')
                     },
                     () => {

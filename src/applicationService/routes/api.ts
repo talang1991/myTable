@@ -71,12 +71,14 @@ api.post('/addKey', (req, res) => {
                 }
             },
             () => {
-                KeyValueTableService.addKey((err) => {
+                KeyValueTableService.addKey((err, tid) => {
+                    tableId = tid;
                     tasks.next(err);
                 }, key, tableId)
             },
             () => {
                 res.json({
+                    tableId: tableId,
                     status: 1
                 })
             }

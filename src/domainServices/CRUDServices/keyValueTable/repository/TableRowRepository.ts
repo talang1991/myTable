@@ -3,10 +3,10 @@ import { Model, Document } from 'mongoose';
 import { IError } from '../../../../utility/interface/IError';
 import { SyncTaskArray } from "../../../../utility/class/flow/SyncTaskArray";
 import { HandleCallback } from "../../../../utility/class/flow/handleCallback";
-import { Util, ParserString } from '../../../../utility/class/Util';
+import { Util } from '../../../../utility/class/Util';
 import { KeyTableValue } from '../schema/KeySchema';
 import { isNullOrUndefined } from "util";
-import { ValueTable } from '../schema/TableRowSchema';
+import { TableRowModel } from '../schema/TableRowSchema';
 import { createHash } from "crypto";
 import { KeyList } from './KeyListRepository';
 import { ITableRow } from '../../../../utility/interface/entity/ITableRow';
@@ -24,22 +24,18 @@ export class TableRow extends CRUDEntity implements ITableRow {
 
     private _keyList: KeyList
 
-    private _tableName: string
-
     constructor(callback: (err: IError) => void, id: string, keyList: KeyList);
     constructor(callback: (err: IError) => void, content: any, keyList: KeyList);
     constructor() {
         let callback = arguments[0],
             model = arguments[1];
-        super(ValueTable, (err) => {
+        super(TableRowModel, (err) => {
             HandleCallback.handleWithOneParam(err, callback, () => {
                 callback();
             })
         }, arguments[1]);
         this._keyList = arguments[2];
-        this._tableName = this._keyList.tableName;
     }
-
 
     private _getTableRow(): any {
         return this._document.get('tableRow');
@@ -47,6 +43,7 @@ export class TableRow extends CRUDEntity implements ITableRow {
 
     protected _setId(): void {
         this._document.set('keyListId', this.keysListId);
+        this._document.set('tabelName', this.tableName);
         this._document.set('tableRow', {});
         super._setId();
     }
@@ -131,6 +128,10 @@ export class TableRow extends CRUDEntity implements ITableRow {
 
     get keysListId(): string {
         return this._keyList.id;
+    }
+
+    get tableName(): string {
+        return this._keyList.tableName;
     }
 
     getValue(key: string): any {

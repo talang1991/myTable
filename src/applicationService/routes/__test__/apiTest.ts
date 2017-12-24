@@ -3,12 +3,13 @@ import { spawn, ChildProcess, fork } from "child_process";
 import * as requestwebapi from "superagent";
 import { AsyncTaskArray } from '../../../utility/class/flow/AsyncTaskArray';
 import { WaitUntil } from "../../../utility/class/Util";
+import { resolve } from "path";
 
 describe("数据表服务类api接口测试", () => {
     let child: ChildProcess,
         onListen: boolean = false;
     before(() => {
-        child = fork('C:/Users/lichen/Documents/GitHub/myTable/dist/applicationService/bin/testweb')
+        child = fork(resolve(__dirname, "../../../../dist/applicationService/bin/testweb"))
         child.on('message', function (message) {//接收工作进程计算结果
             onListen = true
         });

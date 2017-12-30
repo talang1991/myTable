@@ -65,7 +65,6 @@ function _createKeyList(callback: (err: IError, keyList: KeyList) => void): void
     }, null);
 }
 
-
 function _updateTable(keyListId: string, callback: (err: IError) => void): void {
     let keyList: KeyList
     const tasks = new SyncTaskArray({

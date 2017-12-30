@@ -139,7 +139,6 @@ export class TableRow extends CRUDEntity implements ITableRow {
         return tableRow ? tableRow[key] : null;
     }
 
-
     getContent(): any {
         let row = {},
             keyTable = this._keyList.keyTable,
@@ -154,7 +153,7 @@ export class TableRow extends CRUDEntity implements ITableRow {
         return row;
     }
 
-    update(callback: (err: URIError) => void, content: any) {
+    update(callback: (err: IError) => void, content: any) {
         const tasks = new SyncTaskArray({
             array: [
                 () => {
@@ -170,7 +169,7 @@ export class TableRow extends CRUDEntity implements ITableRow {
         });
     }
 
-    delete(callback: (err: URIError) => void) {
+    delete(callback: (err: IError) => void) {
         this._document.remove((err) => {
             callback(err);
         })

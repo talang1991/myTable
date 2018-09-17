@@ -83,7 +83,7 @@ export class Util {
     }
 }
 
-export class ParserString {
+class ParserString {
     static date(value: string): Date {
         return new Date(value);;
     }

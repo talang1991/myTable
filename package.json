@@ -7,6 +7,7 @@
     "license": "ISC",
     "scripts": {
         "test": "./node_modules/.bin/mocha -t 18000 -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
+        "testD": "./node_modules/.bin/mocha -t 20000 -r ./node_modules/ts-node/register src/**/__test__/**/clusterApiTest.ts",
         "testC": "./node_modules/.bin/mocha -t 20000 -r ./node_modules/ts-node/register src/**/__test__/**/apiTest.ts",
         "testX": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register test.ts"
     },

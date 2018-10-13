@@ -2,9 +2,6 @@ import * as express from "express";
 import * as logger from "morgan";
 import * as cookieParser from "cookie-parser";
 import * as bodyParser from "body-parser";
-import * as session from "express-session";
-import { connection } from "mongoose";
-import * as connectMongo from "connect-mongo";
 import { resolve } from "path";
 import { existsSync, mkdirSync, createWriteStream } from "fs";
 import { connect } from "mongoose";
@@ -12,7 +9,6 @@ import { Util } from "../utility/class/Util";
 import { api } from "./routes/api";
 import * as mongoose from "mongoose";
 (<any>mongoose).Promise = global.Promise;
-const MongoStore = connectMongo(session)
 const logPath = resolve(__dirname, './log');
 existsSync(logPath) || mkdirSync(logPath);
 const now = Util.getDateString(new Date());
@@ -27,15 +23,6 @@ app.use(logger('combined', { stream: accessLogFile }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(session({
-    saveUninitialized: false, // don't create session until something stored
-    resave: true, //don't save session if unmodified
-    secret: 'cmS00',
-    store: new MongoStore({
-        mongooseConnection: connection,
-        touchAfter: 24 * 3600
-    })
-}));
 
 app.use('/api', api);
 

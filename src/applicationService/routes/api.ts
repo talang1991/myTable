@@ -199,7 +199,7 @@ api.post('/updateRow', (req, res) => {
                 } else {
                     tasks.next({
                         name: 'updateRow请求缺少参数',
-                        message: `tableId:${tableId},rowId:{rowId}`
+                        message: `tableId:${tableId},rowId:${rowId}`
                     })
                 }
             },
@@ -224,17 +224,3 @@ api.post('/updateRow', (req, res) => {
         }
     });
 });
-
-/* api.get('/addKey', (req, res) => {
-    const tasks = new SyncTaskArray({
-        array: [
-            () => {
-            },
-            () => {
-            }
-        ],
-        callback: (err) => {
-            res.json({ error: err })
-        }
-    });
-}); */

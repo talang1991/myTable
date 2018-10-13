@@ -20,7 +20,7 @@ export interface KeyIndex {
 }
 
 let KeySchema = new Schema({
-    _id: String,
+    // id: String,
     tableName: String,
     keyArray: [{
         name: String,
@@ -33,6 +33,6 @@ let KeySchema = new Schema({
     keyTable: {}
 });
 
-KeySchema.index({ _id: 1 });
+// KeySchema.index({ id: 1 });
 
 export let KeyModel = model('key', KeySchema);

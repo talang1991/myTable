@@ -3,7 +3,7 @@ import { KeyValueTableService } from '../domainServices/CRUDServices/keyValueTab
 import * as mongoose from "mongoose";
 (<any>mongoose).Promise = global.Promise;
 process.on('message', function (m) { //接收主进程发送过来的消息
-    connect('mongodb://localhost/table-tests', { useMongoClient: true }).then(() => {
+    connect('mongodb://localhost/table-tests').then(() => {
         KeyValueTableService.addRow((err, row) => {
             let rowC;
             if (row) {

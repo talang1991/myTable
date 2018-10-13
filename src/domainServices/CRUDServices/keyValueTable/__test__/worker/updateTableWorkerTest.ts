@@ -7,7 +7,7 @@ import * as mongoose from "mongoose";
 (<any>mongoose).Promise = global.Promise;
 
 process.on('message', function (m) { //接收主进程发送过来的消息
-    connect(`mongodb://localhost/${setting.testDBName}`, { useMongoClient: true }).then(() => {
+    connect(`mongodb://localhost/${setting.testDBName}`).then(() => {
         KeyValueTableService.updateTable((err) => {
             let keylist: KeyList = MemoryCacheService.getCache(setting.keyValueTableCache.keyList).getValue(m.tableId);
             KeyValueTableService.addRow((err, row) => {

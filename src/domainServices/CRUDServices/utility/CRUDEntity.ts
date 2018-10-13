@@ -61,9 +61,9 @@ export abstract class CRUDEntity implements ICRUDEntity {
     }
 
     protected _setId(): void {
-        let md5 = createHash('md5');
+        /* let md5 = createHash('md5');
         this._id = md5.update((new Date().toDateString() + Math.random().toString(8))).digest('base64');
-        this._document.set('_id', this._id);
+        this._document.set('id', this._id); */
     }
 
     protected _findEntity(): void {
@@ -81,7 +81,7 @@ export abstract class CRUDEntity implements ICRUDEntity {
         const tasks = new SyncTaskArray({
             array: [
                 () => {
-                    this._setId();
+                    // this._setId();
                     tasks.next();
                 },
                 () => {

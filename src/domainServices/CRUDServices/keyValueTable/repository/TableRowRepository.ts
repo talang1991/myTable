@@ -45,7 +45,7 @@ export class TableRow extends CRUDEntity implements ITableRow {
         this._document.set('keyListId', this.keysListId);
         this._document.set('tabelName', this.tableName);
         this._document.set('tableRow', {});
-        super._setId();
+        // super._setId();
     }
 
     protected _setEntity(content: Object, callback: (err?: IError) => void): void {

@@ -5,7 +5,7 @@ import { setting } from "../../../../../utility/config/setting";
 (<any>mongoose).Promise = global.Promise;
 
 process.on('message', function (m) { //接收主进程发送过来的消息
-    connect(`mongodb://localhost/${setting.testDBName}`, { useMongoClient: true }).then(() => {
+    connect(`mongodb://localhost/${setting.testDBName}`).then(() => {
         KeyValueTableService.addRow((err, row) => {
             let rowC;
             if (row) {

@@ -19,7 +19,7 @@ existsSync(logPath) || mkdirSync(logPath);
 const now = Util.getDateString(new Date());
 let accessLogFile = createWriteStream(resolve(logPath, './access_' + now + '.log'), { flags: 'a' });
 let errorLogFile = createWriteStream(resolve(logPath, './error_' + now + '.log'), { flags: 'a' });
-connect(`mongodb://localhost/${setting.testApiDBName}`, { useMongoClient: true });
+connect(`mongodb://localhost/${setting.testApiDBName}`);
 
 const app = express();
 

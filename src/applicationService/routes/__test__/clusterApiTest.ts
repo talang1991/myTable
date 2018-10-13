@@ -212,16 +212,16 @@ describe("数据表服务类api接口测试", () => {
             })
 
     })
-    /* it("createTable接口测试5", (done) => {
+    it("createTable接口测试5", (done) => {
         requestwebapi
             .post('http://localhost:3000/api/addKey')
-            .send({ 'name': '1ssxss', 'keyType': 'str', 'tableId': 'asdsas' })
+            .send({ 'name': '1ssxss', 'keyType': 'str', 'tableId': '5bc1af1491d40726d8011111' })
             .end((err, res) => {
                 expect(res.body.error.name).to.equal('未找到相应ID实体');
                 expect(res.body.error.message).to.equal('请确认相应实体ID');
                 done();
             })
-    }) */
+    })
     it("createTable接口测试6", (done) => {
         let tableId: string;
         let test = () => {
@@ -304,6 +304,57 @@ describe("数据表服务类api接口测试", () => {
                                 })
                         })
                 })
+        }
+        beforeTest(test);
+    })
+    it("createTable接口测试7", (done) => {
+        let beforeTest = (callback: (rowId: string, tableId: string) => void) =>
+            requestwebapi
+                .post('http://localhost:3000/api/createTable')
+                .send({ 'name': '1ysddfx' })
+                .end((err, res) => {
+                    let tableId = res.body.tableId;
+                    expect(res.body.status).to.equal(1);
+                    requestwebapi
+                        .post('http://localhost:3000/api/addKey')
+                        .send({ 'name': '1ssxss', 'keyType': 'any', 'tableId': tableId, 'defaultValue': { sss: 111 }, 'isRequired': false })
+                        .end((err, res) => {
+                            tableId = res.body.tableId;
+                            expect(res.body.status).to.equal(1);
+                            requestwebapi
+                                .post('http://localhost:3000/api/addRow')
+                                .send({ 'tableId': tableId })
+                                .end((err, res) => {
+                                    let rowId = res.body.rowId;
+                                    expect(res.body.status).to.equal(1);
+                                    callback(rowId, tableId)
+                                })
+                        })
+
+                })
+        const testFunc = (rowId, tableId, callback: () => void) => {
+            requestwebapi
+                .post('http://localhost:3000/api/getRow')
+                .send({ 'rowId': rowId, 'tableId': tableId })
+                .end((err, res) => {
+                    expect(res.body.row['1ssxss'].sss).to.equal(111);
+                    expect(res.body.status).to.equal(1);
+                    callback()
+                })
+        }
+        let test = (rowId, tableId) => {
+            let start = Date.now()
+            let tasks = new AsyncTaskArray()
+                .end(() => {
+                    let end = Date.now()
+                    console.log(end - start)
+                    done()
+                })
+            for (let i = 0; i < 2000; i++) {
+                tasks.add(() => {
+                    testFunc(rowId, tableId, () => tasks.ckeck());
+                })
+            }
         }
         beforeTest(test);
     })

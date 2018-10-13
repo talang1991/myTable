@@ -34,5 +34,6 @@ let KeySchema = new Schema({
 });
 
 // KeySchema.index({ id: 1 });
+KeySchema.set('autoIndex', false)
 
 export let KeyModel = model('key', KeySchema);

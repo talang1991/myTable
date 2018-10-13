@@ -1,9 +1,10 @@
-import { Model, Document } from "mongoose";
+import { Model, Document, Mongoose } from "mongoose";
 import { SyncTaskArray } from '../../../utility/class/flow/SyncTaskArray';
 import { ICRUDEntity } from '../../../utility/interface/entity/ICRUDEntity';
 import { createHash } from "crypto";
 import { IError } from '../../../utility/interface/IError';
 import { UserError } from "../../../utility/class/UserError";
+import { ObjectId, ObjectID } from "bson";
 /**
  * 这是一个CRUD实体对象的抽象基类
  * 
@@ -23,9 +24,9 @@ export abstract class CRUDEntity implements ICRUDEntity {
     protected _document: Document | null;
     protected _callback: (err: any) => void;
     protected _content: any;
-    protected _id: any;
-    get id(): any {
-        return this._id;
+    protected _id: string;
+    get id(): string {
+        return this._id
     }
 
     /**
@@ -61,13 +62,13 @@ export abstract class CRUDEntity implements ICRUDEntity {
     }
 
     protected _setId(): void {
-        /* let md5 = createHash('md5');
-        this._id = md5.update((new Date().toDateString() + Math.random().toString(8))).digest('base64');
-        this._document.set('id', this._id); */
+        let id = new ObjectId()
+        this._id = id.toHexString()
+        this._document.set('_id', id);
     }
 
     protected _findEntity(): void {
-        this._model.findById(this._id, (err, res) => {
+        this._model.findById(new ObjectId(this._id), (err, res) => {
             if (res) {
                 this._document = res;
                 this._callback(err);
@@ -81,7 +82,7 @@ export abstract class CRUDEntity implements ICRUDEntity {
         const tasks = new SyncTaskArray({
             array: [
                 () => {
-                    // this._setId();
+                    this._setId();
                     tasks.next();
                 },
                 () => {
@@ -113,11 +114,14 @@ export abstract class CRUDEntity implements ICRUDEntity {
         callback()
     }
 
-    protected _saveEntity(callback?: (err: IError, product?: Document, numAffect?: number) => void): void {
-        this._document.save((err, product, numAffect) => {
+    protected _saveEntity(callback?: (err: IError, product?: Document) => void): void {
+        this._document.save((err, product) => {
             this._document = product;
+            if (product) {
+                this._id = product._id.toHexString();
+            }
             if (callback) {
-                callback(err, product, numAffect)
+                callback(err, product)
             }
         });
     }

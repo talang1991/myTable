@@ -9,7 +9,7 @@
         "test": "./node_modules/.bin/mocha -t 18000 -r ./node_modules/ts-node/register src/**/__test__/**/*.ts",
         "testD": "./node_modules/.bin/mocha -t 20000 -r ./node_modules/ts-node/register src/**/__test__/**/clusterApiTest.ts",
         "testC": "./node_modules/.bin/mocha -t 20000 -r ./node_modules/ts-node/register src/**/__test__/**/apiTest.ts",
-        "testX": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register test.ts"
+        "testX": "./node_modules/.bin/mocha -t 5000 -r ./node_modules/ts-node/register src/**/addRowTest.ts"
     },
     "devDependencies": {
         "@types/body-parser": "*",
@@ -24,10 +24,11 @@
         "@types/morgan": "*",
         "@types/node": "*",
         "@types/superagent": "*",
+        "@types/mongoose": "^5.2.19",
         "awesome-typescript-loader": "^5.2.1",
         "browserify": "*",
         "chai": "^4.2.0",
-        "mocha":"^5.2.0",
+        "mocha": "^5.2.0",
         "source-map-loader": "^0.2.4",
         "static-favicon": "^2.0.0-alpha",
         "ts-node": "^7.0.1",
@@ -43,7 +44,6 @@
         "body-parser": "^1.18.3",
         "brorand": "^1.1.0",
         "connect": "^3.6.6",
-        "connect-mongo": "^2.0.1",
         "cookie-parser": "^1.4.3",
         "debug": "^4.0.1",
         "express": "^4.16.3",

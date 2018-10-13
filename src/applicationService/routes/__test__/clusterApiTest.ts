@@ -212,7 +212,7 @@ describe("数据表服务类api接口测试", () => {
             })
 
     })
-    it("createTable接口测试5", (done) => {
+    /* it("createTable接口测试5", (done) => {
         requestwebapi
             .post('http://localhost:3000/api/addKey')
             .send({ 'name': '1ssxss', 'keyType': 'str', 'tableId': 'asdsas' })
@@ -221,7 +221,7 @@ describe("数据表服务类api接口测试", () => {
                 expect(res.body.error.message).to.equal('请确认相应实体ID');
                 done();
             })
-    })
+    }) */
     it("createTable接口测试6", (done) => {
         let tableId: string;
         let test = () => {

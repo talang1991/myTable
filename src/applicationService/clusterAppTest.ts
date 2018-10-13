@@ -4,7 +4,7 @@ import * as cookieParser from "cookie-parser";
 import * as bodyParser from "body-parser";
 import * as session from "express-session";
 import { connection } from "mongoose";
-import * as connectMongo from "connect-mongo/es5";
+import * as connectMongo from "connect-mongo";
 import { resolve } from "path";
 import { existsSync, mkdirSync, createWriteStream } from "fs";
 import { connect } from "mongoose";

@@ -21,7 +21,6 @@
         "@types/express-session": "*",
         "@types/formidable": "*",
         "@types/mocha": "^5.2.5",
-        "@types/mongoose": "*",
         "@types/morgan": "*",
         "@types/node": "*",
         "@types/superagent": "*",

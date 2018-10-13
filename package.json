@@ -14,7 +14,6 @@
     "devDependencies": {
         "@types/body-parser": "*",
         "@types/chai": "^4.1.6",
-        "@types/connect-mongo": "*",
         "@types/cookie-parser": "*",
         "@types/debug": "*",
         "@types/express": "*",
@@ -49,6 +48,7 @@
         "express": "^4.16.3",
         "express-session": "^1.15.6",
         "formidable": "^1.2.1",
+        "connect-mongo": "^2.0.1",
         "mongoose": "^5.3.0",
         "morgan": "^1.9.1"
     }

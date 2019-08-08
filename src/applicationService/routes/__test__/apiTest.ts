@@ -30,7 +30,7 @@ describe("数据表服务类api接口测试", () => {
                     console.log(end - start)
                     done()
                 })
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 10; i++) {
                 tasks.add(() => {
                     testFunc(() => tasks.ckeck());
                 })
@@ -350,7 +350,7 @@ describe("数据表服务类api接口测试", () => {
                     console.log(end - start)
                     done()
                 })
-            for (let i = 0; i < 2000; i++) {
+            for (let i = 0; i < 200; i++) {
                 tasks.add(() => {
                     testFunc(rowId, tableId, () => tasks.ckeck());
                 })
